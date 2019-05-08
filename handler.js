@@ -70,8 +70,8 @@ export const auth = async (event, context) => {
           return data
 
         throw {
-          status: 410,
-          message: 'Login transaction is valid but has expired'
+          status: 401,
+          message: 'Login transaction has expired'
         }
       })
 
@@ -82,7 +82,7 @@ export const auth = async (event, context) => {
     }
 
     else
-      throw 'Include an `account` or `transaction` query string parameter'
+      throw 'Include an `account` or `hash` query string parameter'
   }
 
   catch(err) {
@@ -101,7 +101,7 @@ export const auth = async (event, context) => {
     // console.error(err)
 
     return {
-      statusCode: error.status || 400,
+      statusCode: error.status || err.status || 400,
       body: JSON.stringify(error)
     }
   }
