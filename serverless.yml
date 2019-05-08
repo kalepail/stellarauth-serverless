@@ -1,0 +1,29 @@
+# NOTE: update this with your service name
+service: stellarauth
+
+# Use the serverless-webpack plugin to transpile ES6
+plugins:
+  - serverless-webpack
+  - serverless-offline
+
+# serverless-webpack configuration
+# Enable auto-packing of external modules
+custom:
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  stage: dev
+  region: us-east-1
+  environment: ${file(env.yml):${self:provider.stage}}
+
+functions:
+  auth:
+    handler: handler.auth
+    events:
+      - http:
+          path: auth
+          method: get

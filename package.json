@@ -1,0 +1,28 @@
+{
+  "name": "stellarauth-serverless",
+  "private": true,
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.4.4",
+    "@babel/plugin-transform-runtime": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
+    "@babel/runtime": "^7.4.4",
+    "babel-loader": "^8.0.5",
+    "babel-plugin-source-map-support": "^2.0.1",
+    "jest": "^24.8.0",
+    "serverless-offline": "^4.10.0",
+    "serverless-webpack": "^5.3.0",
+    "webpack": "^4.30.0",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "lodash": "^4.17.11",
+    "moment": "^2.24.0",
+    "sha.js": "^2.4.11",
+    "source-map-support": "^0.5.12",
+    "stellar-sdk": "^0.15.4"
+  }
+}
