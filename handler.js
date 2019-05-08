@@ -97,28 +97,7 @@ export const auth = async (event, context) => {
     ? { message: err.message }
     : err
 
-    console.log(error)
-
-    // const code = _.get(error, 'extras.result_codes.transaction')
-    // const transaction = _.get(error, 'extras.envelope_xdr')
-
-    // if (code === 'tx_bad_auth') {
-    //   const envelope = new StellarSdk.Transaction(transaction)
-    //   const hash = envelope.hash().toString('hex')
-    //   const account = StellarSdk.StrKey.encodeEd25519PublicKey(
-    //     _.get(envelope.toEnvelope(), '_attributes.tx._attributes.sourceAccount._value')
-    //   )
-
-    //   return {
-    //     statusCode: q_account ? 200 : 202,
-    //     body: JSON.stringify({
-    //       account,
-    //       hash,
-    //       transaction
-    //     }),
-    //   }
-    // }
-      
+    console.error(error)
     // console.error(err)
 
     return {
