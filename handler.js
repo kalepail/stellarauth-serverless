@@ -1,8 +1,8 @@
 import _ from 'lodash'
 import StellarSdk from 'stellar-sdk'
 import axios from 'axios'
-import shajs from 'sha.js'
 import moment from 'moment'
+import crypto from 'crypto'
 
 const server = new StellarSdk.Server(process.env.HORIZON_URL)
 const source = StellarSdk.Keypair.fromSecret(process.env.AUTH_SECRET)
@@ -37,11 +37,9 @@ export const auth = async (event, context) => {
         .addMemo(
           new StellarSdk.Memo(
             StellarSdk.MemoText, 
-            (`StellarAuth:${
-              shajs('sha256').update(
-                Math.random().toString()
-              ).digest('hex')
-            }`).substring(0, 28)
+            `StellarAuth:${
+              crypto.randomBytes(32).toString('hex')
+            }`.substring(0, 28)
           )
         )
         .setTimeout(q_timeout)
