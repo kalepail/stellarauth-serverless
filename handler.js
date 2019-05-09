@@ -6,6 +6,9 @@ import crypto from 'crypto'
 
 const server = new StellarSdk.Server(process.env.HORIZON_URL)
 const source = StellarSdk.Keypair.fromSecret(process.env.AUTH_SECRET)
+const headers = {
+  'Access-Control-Allow-Origin': '*'
+}
 
 StellarSdk.Network.useTestNetwork()
 
@@ -18,7 +21,32 @@ export const auth = async (event, context) => {
   )
 
   try {
-    if (q_account) {
+    if (q_hash) {
+      const transaction = await axios
+      .get(`https://horizon-testnet.stellar.org/transactions/${q_hash}`)
+      .then(({data}) => {
+        if (
+          !data.memo
+          || data.memo.indexOf('StellarAuth') === -1
+        ) throw 'Not a login transaction'
+
+        if (moment().isBefore(data.valid_before))
+          return data
+
+        throw {
+          status: 401,
+          message: 'Login transaction has expired'
+        }
+      })
+
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify(transaction)
+      }
+    }
+
+    else if (q_account) {
       let transaction = await server
       .accounts()
       .accountId(q_account)
@@ -54,31 +82,13 @@ export const auth = async (event, context) => {
 
       return {
         statusCode: 200,
+        headers,
         body: JSON.stringify({
           account: q_account,
           hash: transaction.hash().toString('hex'),
           transaction: xdr,
           link: `https://www.stellar.org/laboratory/#txsigner?xdr=${encodeURIComponent(xdr)}&network=${process.env.STELLAR_NETWORK}`
         })
-      }
-    }
-
-    else if (q_hash) {
-      const transaction = await axios
-      .get(`https://horizon-testnet.stellar.org/transactions/${q_hash}`)
-      .then(({data}) => {
-        if (moment().isBefore(data.valid_before))
-          return data
-
-        throw {
-          status: 401,
-          message: 'Login transaction has expired'
-        }
-      })
-
-      return {
-        statusCode: 200,
-        body: JSON.stringify(transaction)
       }
     }
 
@@ -103,6 +113,7 @@ export const auth = async (event, context) => {
 
     return {
       statusCode: error.status || err.status || 400,
+      headers,
       body: JSON.stringify(error)
     }
   }
