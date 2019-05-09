@@ -2,6 +2,8 @@
   "name": "stellarauth-serverless",
   "private": true,
   "scripts": {
+    "dev": "sls offline start",
+    "deploy": "sls deploy",
     "test": "jest"
   },
   "devDependencies": {
@@ -12,6 +14,7 @@
     "babel-loader": "^8.0.5",
     "babel-plugin-source-map-support": "^2.0.1",
     "jest": "^24.8.0",
+    "serverless-domain-manager": "^3.2.1",
     "serverless-offline": "^4.10.0",
     "serverless-webpack": "^5.3.0",
     "webpack": "^4.30.0",

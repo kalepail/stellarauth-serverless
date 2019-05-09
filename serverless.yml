@@ -1,14 +1,16 @@
-# NOTE: update this with your service name
 service: stellarauth
 
-# Use the serverless-webpack plugin to transpile ES6
 plugins:
   - serverless-webpack
   - serverless-offline
+  - serverless-domain-manager
 
-# serverless-webpack configuration
-# Enable auto-packing of external modules
 custom:
+  customDomain:
+    domainName: api.stellarauth.com
+    certificateName: api.stellarauth.com
+    stage: dev
+    createRoute53Record: false
   webpack:
     webpackConfig: ./webpack.config.js
     includeModules: true
