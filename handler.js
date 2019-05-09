@@ -50,12 +50,15 @@ export const auth = async (event, context) => {
         return transaction
       })
 
+      const xdr = transaction.toXDR()
+
       return {
         statusCode: 200,
         body: JSON.stringify({
           account: q_account,
           hash: transaction.hash().toString('hex'),
-          transaction: transaction.toXDR()
+          transaction: xdr,
+          link: `https://www.stellar.org/laboratory/#txsigner?xdr=${encodeURIComponent(xdr)}&network=${process.env.STELLAR_NETWORK}`
         })
       }
     }
