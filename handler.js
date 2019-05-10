@@ -100,7 +100,7 @@ export const auth = async (event, context) => {
     }
 
     else
-      throw 'Include an `account` or `hash` and `token` query string parameter(s)'
+      throw 'Include `account` or `hash` and `token` query string parameter(s)'
   }
 
   catch(err) {
