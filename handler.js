@@ -2,6 +2,7 @@ import _ from 'lodash'
 import StellarSdk from 'stellar-sdk'
 import axios from 'axios'
 import moment from 'moment'
+import shajs from 'sha.js'
 import crypto from 'crypto'
 
 const server = new StellarSdk.Server(process.env.HORIZON_URL)
@@ -15,20 +16,24 @@ StellarSdk.Network.useTestNetwork()
 export const auth = async (event, context) => {
   const q_account = _.get(event, 'queryStringParameters.account')
   const q_hash = _.get(event, 'queryStringParameters.hash')
+  const q_token = _.get(event, 'queryStringParameters.token')
   const q_timeout = parseInt(
     _.get(event, 'queryStringParameters.timeout', 300),
     10
   )
 
   try {
-    if (q_hash) {
+    if (
+      q_hash 
+      && q_token
+    ) {
       const transaction = await axios
       .get(`https://horizon-testnet.stellar.org/transactions/${q_hash}`)
       .then(({data}) => {
         if (
           !data.memo
-          || data.memo.indexOf('StellarAuth') === -1
-        ) throw 'Not a login transaction'
+          || shajs('sha256').update(q_token).digest('hex') !== Buffer.from(data.memo, 'base64').toString('hex')
+        ) throw 'Transaction memo hash and token don\'t match' 
 
         if (moment().isBefore(data.valid_before))
           return data
@@ -47,6 +52,9 @@ export const auth = async (event, context) => {
     }
 
     else if (q_account) {
+      const token = crypto.randomBytes(32).toString('hex')
+      const memo = shajs('sha256').update(token).digest('hex')
+
       let transaction = await server
       .accounts()
       .accountId(q_account)
@@ -64,10 +72,8 @@ export const auth = async (event, context) => {
         }))
         .addMemo(
           new StellarSdk.Memo(
-            StellarSdk.MemoText, 
-            `StellarAuth:${
-              crypto.randomBytes(32).toString('hex')
-            }`.substring(0, 28)
+            StellarSdk.MemoHash, 
+            memo
           )
         )
         .setTimeout(q_timeout)
@@ -86,6 +92,7 @@ export const auth = async (event, context) => {
         body: JSON.stringify({
           account: q_account,
           hash: transaction.hash().toString('hex'),
+          token,
           transaction: xdr,
           link: `https://www.stellar.org/laboratory/#txsigner?xdr=${encodeURIComponent(xdr)}&network=${process.env.STELLAR_NETWORK}`
         })
@@ -93,7 +100,7 @@ export const auth = async (event, context) => {
     }
 
     else
-      throw 'Include an `account` or `hash` query string parameter'
+      throw 'Include an `account` or `hash` and `token` query string parameter(s)'
   }
 
   catch(err) {
