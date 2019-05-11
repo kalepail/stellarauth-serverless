@@ -35,6 +35,10 @@ export const auth = async (event, context) => {
       const hash_token = await jwt.verify(h_auth, process.env.JWT_SECRET)
       const transaction = await axios
       .get(`https://horizon-testnet.stellar.org/transactions/${hash_token.hash}`)
+      .catch((err) => {
+        err.response.data.resource = 'transaction'
+        throw err
+      })
       .then(({data}) => {
         if (
           !data.memo
@@ -65,6 +69,10 @@ export const auth = async (event, context) => {
       .accounts()
       .accountId(q_account)
       .call()
+      .catch((err) => {
+        err.response.resource = 'account'
+        throw err
+      })
       .then(({ sequence }) => {
         const transaction = new StellarSdk.TransactionBuilder(
           new StellarSdk.Account(q_account, sequence),
