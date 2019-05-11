@@ -4,6 +4,7 @@ import axios from 'axios'
 import moment from 'moment'
 import shajs from 'sha.js'
 import crypto from 'crypto'
+import jwt from 'jsonwebtoken'
 
 const server = new StellarSdk.Server(process.env.HORIZON_URL)
 const source = StellarSdk.Keypair.fromSecret(process.env.AUTH_SECRET)
@@ -14,25 +15,30 @@ const headers = {
 StellarSdk.Network.useTestNetwork()
 
 export const auth = async (event, context) => {
+  let h_auth = _.get(event, 'headers.Authorization', _.get(event, 'headers.authorization'))
   const q_account = _.get(event, 'queryStringParameters.account')
-  const q_hash = _.get(event, 'queryStringParameters.hash')
-  const q_token = _.get(event, 'queryStringParameters.token')
   const q_timeout = parseInt(
     _.get(event, 'queryStringParameters.timeout', 300),
     10
   )
 
   try {
-    if (
-      q_hash 
-      && q_token
-    ) {
+    if (h_auth) {
+      if (
+        h_auth
+        && h_auth.substring(0, 7) === 'Bearer '
+      ) h_auth = h_auth.replace('Bearer ', '')
+  
+      else
+        throw 'Authorization header malformed'
+
+      const hash_token = await jwt.verify(h_auth, process.env.JWT_SECRET)
       const transaction = await axios
-      .get(`https://horizon-testnet.stellar.org/transactions/${q_hash}`)
+      .get(`https://horizon-testnet.stellar.org/transactions/${hash_token.hash}`)
       .then(({data}) => {
         if (
           !data.memo
-          || shajs('sha256').update(q_token).digest('hex') !== Buffer.from(data.memo, 'base64').toString('hex')
+          || shajs('sha256').update(hash_token.token).digest('hex') !== Buffer.from(data.memo, 'base64').toString('hex')
         ) throw 'Transaction memo hash and token don\'t match' 
 
         if (moment().isBefore(data.valid_before))
@@ -52,7 +58,7 @@ export const auth = async (event, context) => {
     }
 
     else if (q_account) {
-      const token = crypto.randomBytes(32).toString('hex')
+      const token = crypto.randomBytes(64).toString('hex')
       const memo = shajs('sha256').update(token).digest('hex')
 
       let transaction = await server
@@ -85,22 +91,29 @@ export const auth = async (event, context) => {
       })
 
       const xdr = transaction.toXDR()
+      const auth = jwt.sign({
+        exp: parseInt(
+          moment().add(q_timeout, 'seconds').format('X'), 
+          10
+        ),
+        hash: transaction.hash().toString('hex'),
+        token, 
+      }, process.env.JWT_SECRET);
 
       return {
         statusCode: 200,
         headers,
         body: JSON.stringify({
           account: q_account,
-          hash: transaction.hash().toString('hex'),
-          token,
           transaction: xdr,
-          link: `https://www.stellar.org/laboratory/#txsigner?xdr=${encodeURIComponent(xdr)}&network=${process.env.STELLAR_NETWORK}`
+          link: `https://www.stellar.org/laboratory/#txsigner?xdr=${encodeURIComponent(xdr)}&network=${process.env.STELLAR_NETWORK}`,
+          auth
         })
       }
     }
 
     else
-      throw 'Include `account` or `hash` and `token` query string parameter(s)'
+      throw 'Missing both `account` query string parameter and `Authorization` header jwt'
   }
 
   catch(err) {
