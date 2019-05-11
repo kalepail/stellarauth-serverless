@@ -121,7 +121,7 @@ export const auth = async (event, context) => {
     }
 
     else
-      throw 'Missing both `account` query string parameter and `Authorization` header jwt'
+      throw 'Include either `account` query string parameter or `Authorization` header token'
   }
 
   catch(err) {
