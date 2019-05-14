@@ -121,7 +121,7 @@ export const auth = async (event, context) => {
     }
 
     else
-      throw 'Include either `account` query string parameter or `Authorization` header token'
+      throw 'Include either an `account` query string parameter or an `Authorization` header token'
   }
 
   catch(err) {
