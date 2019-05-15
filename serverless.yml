@@ -15,6 +15,7 @@ custom:
     webpackConfig: ./webpack.config.js
     includeModules: true
   serverless-offline:
+    httpsProtocol: certs
     port: 4000
 
 provider:

@@ -6,11 +6,14 @@ import shajs from 'sha.js'
 import crypto from 'crypto'
 import jwt from 'jsonwebtoken'
 
+const isDev = process.env.NODE_ENV !== 'production'
 const server = new StellarSdk.Server(process.env.HORIZON_URL)
 const source = StellarSdk.Keypair.fromSecret(process.env.AUTH_SECRET)
 const headers = {
   'Access-Control-Allow-Origin': '*'
 }
+
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = isDev ? 0 : 1
 
 StellarSdk.Network.useTestNetwork()
 
