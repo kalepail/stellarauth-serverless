@@ -45,7 +45,10 @@ export const auth = async (event, context) => {
       .then(({data}) => {
         if (
           !data.memo
-          || shajs('sha256').update(hash_token.token).digest('hex') !== Buffer.from(data.memo, 'base64').toString('hex')
+          || Buffer.compare(
+            shajs('sha256').update(hash_token.token).digest(), 
+            Buffer.from(data.memo, 'base64')
+          ) !== 0
         ) throw 'Transaction memo hash and token don\'t match' 
 
         if (moment().isBefore(data.valid_before))
@@ -66,7 +69,7 @@ export const auth = async (event, context) => {
 
     else if (q_account) {
       const token = crypto.randomBytes(64).toString('hex')
-      const memo = shajs('sha256').update(token).digest('hex')
+      const memo = shajs('sha256').update(token).digest()
 
       let transaction = await server
       .accounts()
