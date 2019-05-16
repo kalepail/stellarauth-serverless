@@ -80,9 +80,20 @@ export const auth = async (event, context) => {
         throw err
       })
       .then(({ sequence }) => {
+        const date = moment()
         const transaction = new StellarSdk.TransactionBuilder(
           new StellarSdk.Account(q_account, sequence),
-          { fee: '100' }
+          { 
+            fee: '100',
+            timebounds: {
+              minTime: date.format('X'),
+              maxTime: date.add(q_timeout, 'seconds').format('X')
+            },
+            memo: new StellarSdk.Memo(
+              StellarSdk.MemoHash, 
+              memo
+            )
+          }
         )
         .addOperation(StellarSdk.Operation.payment({
           destination: q_account,
@@ -90,13 +101,6 @@ export const auth = async (event, context) => {
           amount: '0.0000100',
           source: source.publicKey()
         }))
-        .addMemo(
-          new StellarSdk.Memo(
-            StellarSdk.MemoHash, 
-            memo
-          )
-        )
-        .setTimeout(q_timeout)
         .build()
 
         transaction.sign(StellarSdk.Keypair.fromSecret(source.secret()))
