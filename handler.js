@@ -68,6 +68,7 @@ export const auth = async (event, context) => {
     }
 
     else if (q_account) {
+      const date = moment().subtract(5, 'seconds')
       const token = crypto.randomBytes(64).toString('hex')
       const memo = shajs('sha256').update(token).digest()
 
@@ -80,7 +81,6 @@ export const auth = async (event, context) => {
         throw err
       })
       .then(({ sequence }) => {
-        const date = moment()
         const transaction = new StellarSdk.TransactionBuilder(
           new StellarSdk.Account(q_account, sequence),
           { 
@@ -111,7 +111,7 @@ export const auth = async (event, context) => {
       const xdr = transaction.toXDR()
       const auth = jwt.sign({
         exp: parseInt(
-          moment().add(q_timeout, 'seconds').format('X'), 
+          date.add(q_timeout, 'seconds').format('X'), 
           10
         ),
         hash: transaction.hash().toString('hex'),
@@ -124,7 +124,6 @@ export const auth = async (event, context) => {
         body: JSON.stringify({
           account: q_account,
           transaction: xdr,
-          link: `https://www.stellar.org/laboratory/#txsigner?xdr=${encodeURIComponent(xdr)}&network=${process.env.STELLAR_NETWORK}`,
           auth
         })
       }
