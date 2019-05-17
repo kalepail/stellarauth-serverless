@@ -20,7 +20,6 @@ StellarSdk.Network.useTestNetwork()
 
 export const auth = async (event, context) => {
   let h_auth = _.get(event, 'headers.Authorization', _.get(event, 'headers.authorization'))
-  const q_token = _.get(event, 'queryStringParameters.token')
   const q_account = _.get(event, 'queryStringParameters.account')
   const q_timeout = parseInt(
     _.get(event, 'queryStringParameters.timeout', 3600),
