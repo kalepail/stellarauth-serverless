@@ -79,37 +79,39 @@ export const auth = async (event, context) => {
       .order('desc')
       .limit(60 / 5) // Max ledgers per minute
       .call()
-      .then(async (page) => {
+      .then(async (page) => new bluebird((resolve, reject) => {
         let rejected
 
-        return await new bluebird((resolve, reject) => {
-          _.each(page.records, (record) => {
+        _.each(page.records, (record) => {
+          if (rejected)
+            return false
+
+          const envelope = new StellarSdk.Transaction(record.envelope_xdr)
+
+          _.each(envelope.operations, (operation) => {
             if (rejected)
               return false
 
-            const envelope = new StellarSdk.Transaction(record.envelope_xdr)
-  
-            _.each(envelope.operations, (operation) => {
-              if (rejected)
-                return false
+            console.log( moment().format() )
+            console.log( moment(record.created_at).add(5, 'minutes').format() )
 
-              if (
-                operation.source === StellarSdk.Keypair.fromSecret(process.env.AUTH_SECRET).publicKey()
-                && moment(record.created_at).add(5, 'minutes').isBefore()
-              ) {
-                rejected = true
-                reject({
-                  status: 429,
-                  message: 'Too many auth requests, please slow down'
-                })
-              }
-            })
+            if (
+              !rejected
+              && operation.source === StellarSdk.Keypair.fromSecret(process.env.AUTH_SECRET).publicKey()
+              && moment(record.created_at).add(1, 'minute').isAfter()
+            ) {
+              rejected = true
+              reject({
+                status: 429,
+                message: 'Too many auth requests, please slow down'
+              })
+            }
           })
-
-          if (!rejected)
-            resolve()
         })
-      })
+
+        if (!rejected)
+          resolve()
+      }))
 
       const date = moment().subtract(5, 'seconds')
       const token = crypto.randomBytes(64).toString('hex')
