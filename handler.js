@@ -5,6 +5,7 @@ import moment from 'moment'
 import shajs from 'sha.js'
 import crypto from 'crypto'
 import jwt from 'jsonwebtoken'
+import bluebird from 'bluebird'
 
 const isDev = process.env.NODE_ENV !== 'production'
 const server = new StellarSdk.Server(process.env.HORIZON_URL)
@@ -19,6 +20,7 @@ StellarSdk.Network.useTestNetwork()
 
 export const auth = async (event, context) => {
   let h_auth = _.get(event, 'headers.Authorization', _.get(event, 'headers.authorization'))
+  const q_token = _.get(event, 'queryStringParameters.token')
   const q_account = _.get(event, 'queryStringParameters.account')
   const q_timeout = parseInt(
     _.get(event, 'queryStringParameters.timeout', 3600),
@@ -71,9 +73,51 @@ export const auth = async (event, context) => {
     }
 
     else if (q_account) {
+      await server
+      .transactions()
+      .forAccount(q_account)
+      .order('desc')
+      .limit(60 / 5) // Max ledgers per minute
+      .call()
+      .then(async (page) => new bluebird((resolve, reject) => {
+        let rejected
+
+        _.each(page.records, (record) => {
+          if (rejected)
+            return false
+
+          const envelope = new StellarSdk.Transaction(record.envelope_xdr)
+
+          _.each(envelope.operations, (operation) => {
+            if (rejected)
+              return false
+
+            console.log( moment().format() )
+            console.log( moment(record.created_at).add(5, 'minutes').format() )
+
+            if (
+              !rejected
+              && operation.source === StellarSdk.Keypair.fromSecret(process.env.AUTH_SECRET).publicKey()
+              && moment(record.created_at).add(1, 'minute').isAfter()
+            ) {
+              rejected = true
+              reject({
+                status: 429,
+                message: 'Too many auth requests, please slow down'
+              })
+            }
+          })
+        })
+
+        if (!rejected)
+          resolve()
+      }))
+
       const date = moment().subtract(5, 'seconds')
       const token = crypto.randomBytes(64).toString('hex')
       const memo = shajs('sha256').update(token).digest()
+
+      // Otherwise generate a new one
       const transaction = await server
       .accounts()
       .accountId(q_account)
