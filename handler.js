@@ -26,6 +26,9 @@ export const auth = async (event, context) => {
   )
 
   try {
+    if (q_timeout < 300)
+      throw 'Timeout must be at least 300 seconds'
+
     if (h_auth) {
       if (
         h_auth
