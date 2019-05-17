@@ -28,6 +28,9 @@ export const auth = async (event, context) => {
   )
 
   try {
+    if (q_timeout < 300)
+      throw 'Timeout must be at least 300 seconds'
+
     if (h_auth) {
       if (
         h_auth
@@ -70,67 +73,50 @@ export const auth = async (event, context) => {
     }
 
     else if (q_account) {
-      let transaction
-
-      // If there's a current auth request just return that one
-      if (q_token) transaction = await server
+      await server
       .transactions()
       .forAccount(q_account)
       .order('desc')
       .limit(60 / 5) // Max ledgers per minute
       .call()
       .then(async (page) => {
-        let resolved
+        let rejected
 
-        return await new bluebird((resolve) => {
+        return await new bluebird((resolve, reject) => {
           _.each(page.records, (record) => {
-            if (resolved)
+            if (rejected)
               return false
 
             const envelope = new StellarSdk.Transaction(record.envelope_xdr)
   
             _.each(envelope.operations, (operation) => {
-              if (resolved)
+              if (rejected)
                 return false
 
               if (
                 operation.source === StellarSdk.Keypair.fromSecret(process.env.AUTH_SECRET).publicKey()
-                && moment().isBefore(record.valid_before)
+                && moment(record.created_at).add(5, 'minutes').isBefore()
               ) {
-                resolved = true
-
-                record.auth = jwt.sign({
-                  exp: parseInt(
-                    moment(record.valid_before).format('X'), 
-                    10
-                  ),
-                  hash: record.id,
-                  token: q_token,
-                }, process.env.JWT_SECRET)
-
-                resolve(record)
+                rejected = true
+                reject({
+                  status: 429,
+                  message: 'Too many auth requests, please slow down'
+                })
               }
             })
           })
 
-          if (!resolved)
+          if (!rejected)
             resolve()
         })
       })
-      .catch((err) => console.error(err)) // Don't block on this error
-
-      if (transaction) return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify(transaction)
-      }
 
       const date = moment().subtract(5, 'seconds')
       const token = crypto.randomBytes(64).toString('hex')
       const memo = shajs('sha256').update(token).digest()
 
       // Otherwise generate a new one
-      transaction = await server
+      const transaction = await server
       .accounts()
       .accountId(q_account)
       .call()
