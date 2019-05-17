@@ -49,20 +49,23 @@ export const auth = async (event, context) => {
       })
       .then(({data}) => {
         if (
+          _.filter(data.operations, (operation) => operation.source && operation.source === source.publicKey()).length
+        ) throw 'Transaction contains unauthorized operations' 
+
+        if (
           !data.memo
           || Buffer.compare(
             shajs('sha256').update(hash_token.token).digest(), 
             Buffer.from(data.memo, 'base64')
           ) !== 0
-        ) throw 'Transaction memo hash and token don\'t match' 
+        ) throw 'Transaction memo hash and token don\'t match'
 
-        if (moment().isBefore(data.valid_before))
-          return data
-
-        throw {
+        if (moment().isAfter(data.valid_before)) throw {
           status: 401,
           message: 'Login transaction has expired'
         }
+          
+        return data
       })
 
       return {
@@ -97,7 +100,7 @@ export const auth = async (event, context) => {
 
             if (
               !rejected
-              && operation.source === StellarSdk.Keypair.fromSecret(process.env.AUTH_SECRET).publicKey()
+              && operation.source === source.publicKey()
               && moment(record.created_at).add(1, 'minute').isAfter()
             ) {
               rejected = true
