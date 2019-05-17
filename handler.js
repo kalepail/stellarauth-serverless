@@ -5,7 +5,6 @@ import moment from 'moment'
 import shajs from 'sha.js'
 import crypto from 'crypto'
 import jwt from 'jsonwebtoken'
-// import bluebird from 'bluebird'
 
 const isDev = process.env.NODE_ENV !== 'production'
 const server = new StellarSdk.Server(process.env.HORIZON_URL)
@@ -22,7 +21,7 @@ export const auth = async (event, context) => {
   let h_auth = _.get(event, 'headers.Authorization', _.get(event, 'headers.authorization'))
   const q_account = _.get(event, 'queryStringParameters.account')
   const q_timeout = parseInt(
-    _.get(event, 'queryStringParameters.timeout', 300),
+    _.get(event, 'queryStringParameters.timeout', 3600),
     10
   )
 
@@ -69,67 +68,9 @@ export const auth = async (event, context) => {
     }
 
     else if (q_account) {
-      // let transaction
-
       const date = moment().subtract(5, 'seconds')
       const token = crypto.randomBytes(64).toString('hex')
       const memo = shajs('sha256').update(token).digest()
-
-      // If there's a current auth request just return that one
-      // transaction = await server
-      // .transactions()
-      // .forAccount(q_account)
-      // .order('desc')
-      // .limit(60 / 5) // Max ledgers per minute
-      // .call()
-      // .then(async (page) => {
-      //   let resolved
-
-      //   return await new bluebird((resolve) => {
-      //     _.each(page.records, (record) => {
-      //       if (resolved)
-      //         return false
-
-      //       const envelope = new StellarSdk.Transaction(record.envelope_xdr)
-  
-      //       _.each(envelope.operations, (operation) => {
-      //         if (resolved)
-      //           return false
-
-      //         if (
-      //           operation.source === StellarSdk.Keypair.fromSecret(process.env.AUTH_SECRET).publicKey()
-      //           && moment().isBefore(record.valid_before)
-      //         ) {
-      //           resolved = true
-
-      //           // FAILS. We can't know the previous login's token
-      //           // const auth = jwt.sign({
-      //           //   exp: parseInt(
-      //           //     moment(record.valid_before).format('X'), 
-      //           //     10
-      //           //   ),
-      //           //   hash: record.id,
-      //           //   token,
-      //           // }, process.env.JWT_SECRET)
-
-      //           resolve(record)
-      //         }
-      //       })
-      //     })
-
-      //     if (!resolved)
-      //       resolve()
-      //   })
-      // })
-      // .catch((err) => console.error(err)) // Don't block on this error
-
-      // if (transaction) return {
-      //   statusCode: 200,
-      //   headers,
-      //   body: JSON.stringify(transaction)
-      // }
-
-      // Otherwise generate a new one
       const transaction = await server
       .accounts()
       .accountId(q_account)
