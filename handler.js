@@ -94,9 +94,6 @@ export const auth = async (event, context) => {
             if (rejected)
               return false
 
-            console.log( moment().format() )
-            console.log( moment(record.created_at).add(5, 'minutes').format() )
-
             if (
               !rejected
               && operation.source === source.publicKey()
