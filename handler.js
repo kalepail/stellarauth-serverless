@@ -8,6 +8,8 @@ import jwt from 'jsonwebtoken'
 import bluebird from 'bluebird'
 
 const isDev = process.env.NODE_ENV !== 'production'
+const isTestnet = process.env.STELLAR_NETWORK === 'TESTNET'
+
 const server = new StellarSdk.Server(process.env.HORIZON_URL)
 const source = StellarSdk.Keypair.fromSecret(process.env.AUTH_SECRET)
 const headers = {
@@ -16,7 +18,9 @@ const headers = {
 
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = isDev ? 0 : 1
 
-StellarSdk.Network.useTestNetwork()
+StellarSdk.Network.use(
+  new StellarSdk.Network(StellarSdk.Networks[process.env.STELLAR_NETWORK])
+)
 
 export const auth = async (event, context) => {
   let h_auth = _.get(event, 'headers.Authorization', _.get(event, 'headers.authorization'))
@@ -119,8 +123,18 @@ export const auth = async (event, context) => {
       // Otherwise generate a new one
       const transaction = await server
       .accounts()
-      .accountId(q_account)
+      .accountId(source.publicKey())
       .call()
+      .catch((err) => {
+        if (isTestnet)
+          return axios.get(`https://friendbot.stellar.org?addr=${source.publicKey()}`)
+        throw err
+      })
+      .then(() => server
+        .accounts()
+        .accountId(q_account)
+        .call()
+      )
       .catch((err) => {
         err.response.resource = 'account'
         throw err
