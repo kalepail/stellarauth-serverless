@@ -7,9 +7,9 @@ plugins:
 
 custom:
   customDomain:
-    domainName: api.stellarauth.com
-    certificateName: api.stellarauth.com
-    stage: dev
+    domainName: ${opt:subdomain}.stellarauth.com
+    certificateName: ${opt:subdomain}.stellarauth.com
+    stage: ${opt:stage}
     createRoute53Record: false
   webpack:
     webpackConfig: ./webpack.config.js
@@ -21,9 +21,9 @@ custom:
 provider:
   name: aws
   runtime: nodejs8.10
-  stage: dev
+  stage: ${opt:stage}
   region: us-east-1
-  environment: ${file(env.yml):${self:provider.stage}}
+  environment: ${file(env.yml):${opt:stage}}
 
 functions:
   auth:
