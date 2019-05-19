@@ -45,7 +45,7 @@ export const auth = async (event, context) => {
 
       const hash_token = await jwt.verify(h_auth, process.env.JWT_SECRET)
       const transaction = await axios
-      .get(`https://horizon-testnet.stellar.org/transactions/${hash_token.hash}`)
+      .get(`${process.env.HORIZON_URL}/transactions/${hash_token.hash}`)
       .catch((err) => {
         err.response.data.resource = 'transaction'
         throw err
