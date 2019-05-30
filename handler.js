@@ -25,14 +25,14 @@ StellarSdk.Network.use(
 export const auth = async (event, context) => {
   let h_auth = _.get(event, 'headers.Authorization', _.get(event, 'headers.authorization'))
   const q_account = _.get(event, 'queryStringParameters.account')
-  const q_timeout = parseInt(
-    _.get(event, 'queryStringParameters.timeout', 3600),
+  const q_ttl = parseInt(
+    _.get(event, 'queryStringParameters.ttl', 3600),
     10
   )
 
   try {
-    if (q_timeout < 60)
-      throw 'Timeout must be at least 60 seconds'
+    if (q_ttl < 60)
+      throw 'TTL (time to live) must be at least 60 seconds'
 
     if (h_auth) {
       if (
@@ -146,7 +146,7 @@ export const auth = async (event, context) => {
             fee: '100',
             timebounds: {
               minTime: date.format('X'),
-              maxTime: date.add(q_timeout, 'seconds').format('X')
+              maxTime: date.add(q_ttl, 'seconds').format('X')
             },
             memo: new StellarSdk.Memo(
               StellarSdk.MemoHash, 
@@ -170,7 +170,7 @@ export const auth = async (event, context) => {
       const xdr = transaction.toXDR()
       const auth = jwt.sign({
         exp: parseInt(
-          date.add(q_timeout, 'seconds').format('X'), 
+          date.add(q_ttl, 'seconds').format('X'), 
           10
         ),
         hash: transaction.hash().toString('hex'),
