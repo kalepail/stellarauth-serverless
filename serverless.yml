@@ -1,3 +1,5 @@
+tenant: tyvdh
+app: stellarauth
 service: stellarauth
 
 plugins:
