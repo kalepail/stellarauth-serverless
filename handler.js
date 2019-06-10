@@ -67,8 +67,22 @@ export const auth = async (event, context) => {
           status: 401,
           message: 'Login transaction has expired'
         }
-          
-        return data
+
+        return _.omit(data, [
+          '_links',
+          'fee_meta_xdr',
+          'memo_type',
+          'result_meta_xdr',
+          'result_xdr',
+          'envelope_xdr',
+          'operation_count',
+          'max_fee',
+          'fee_charged',
+          'fee_paid',
+          'source_account_sequence',
+          'paging_token',
+          'id',
+        ])
       })
 
       return {

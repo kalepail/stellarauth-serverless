@@ -2,7 +2,7 @@
   "name": "stellarauth-serverless",
   "private": true,
   "scripts": {
-    "dev": "sls offline start",
+    "dev": "sls offline start --stage dev --subdomain api-testnet",
     "deploy:dev": "sls deploy --stage dev --subdomain api-testnet",
     "deploy:prod": "sls deploy --stage prod --subdomain api"
   },
