@@ -2,8 +2,6 @@ import _ from 'lodash'
 import StellarSdk from 'stellar-sdk'
 import axios from 'axios'
 import moment from 'moment'
-import shajs from 'sha.js'
-import crypto from 'crypto'
 import jwt from 'jsonwebtoken'
 import bluebird from 'bluebird'
 
@@ -43,9 +41,9 @@ export const auth = async (event, context) => {
       else
         throw 'Authorization header malformed'
 
-      const hash_token = await jwt.verify(h_auth, process.env.JWT_SECRET)
+      const {jti} = await jwt.verify(h_auth, process.env.JWT_SECRET)
       const transaction = await axios
-      .get(`${process.env.HORIZON_URL}/transactions/${hash_token.hash}`)
+      .get(`${process.env.HORIZON_URL}/transactions/${jti}`)
       .catch((err) => {
         err.response.data.resource = 'transaction'
         throw err
@@ -54,14 +52,6 @@ export const auth = async (event, context) => {
         if (
           _.filter(data.operations, (operation) => operation.source && operation.source === source.publicKey()).length
         ) throw 'Transaction contains unauthorized operations' 
-
-        if (
-          !data.memo
-          || Buffer.compare(
-            shajs('sha256').update(hash_token.token).digest(), 
-            Buffer.from(data.memo, 'base64')
-          ) !== 0
-        ) throw 'Transaction memo hash and token don\'t match'
 
         if (moment().isAfter(data.valid_before)) throw {
           status: 401,
@@ -131,8 +121,6 @@ export const auth = async (event, context) => {
       }))
 
       const date = moment().subtract(5, 'seconds')
-      const token = crypto.randomBytes(64).toString('hex')
-      const memo = shajs('sha256').update(token).digest()
 
       // Otherwise generate a new one
       const transaction = await server
@@ -161,11 +149,7 @@ export const auth = async (event, context) => {
             timebounds: {
               minTime: date.format('X'),
               maxTime: date.add(q_ttl, 'seconds').format('X')
-            },
-            memo: new StellarSdk.Memo(
-              StellarSdk.MemoHash, 
-              memo
-            )
+            }
           }
         )
         .addOperation(StellarSdk.Operation.payment({
@@ -183,19 +167,23 @@ export const auth = async (event, context) => {
 
       const xdr = transaction.toXDR()
       const auth = jwt.sign({
+        iss: 'https://stellarauth.com',
+        sub: q_account,
+        iat: parseInt(
+          date.format('X'), 
+          10
+        ),
         exp: parseInt(
           date.add(q_ttl, 'seconds').format('X'), 
           10
         ),
-        hash: transaction.hash().toString('hex'),
-        token, 
+        jti: transaction.hash().toString('hex')
       }, process.env.JWT_SECRET)
 
       return {
         statusCode: 200,
         headers,
         body: JSON.stringify({
-          account: q_account,
           transaction: xdr,
           auth
         })
