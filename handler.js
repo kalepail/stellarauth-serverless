@@ -185,6 +185,7 @@ export const auth = async (event, context) => {
       const uri = TransactionStellarUri.forTransaction( new StellarSdk.Transaction(xdr) )
       uri.msg = 'StellarAuth transaction'
       uri.originDomain = 'stellarauth.com'
+      uri.networkPassphrase = StellarSdk.Networks[process.env.STELLAR_NETWORK]
       uri.addSignature(source)
 
       return {
