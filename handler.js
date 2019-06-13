@@ -5,6 +5,8 @@ import moment from 'moment'
 import jwt from 'jsonwebtoken'
 import bluebird from 'bluebird'
 
+import { TransactionStellarUri } from '@stellarguard/stellar-uri'
+
 const isDev = process.env.NODE_ENV !== 'production'
 const isTestnet = process.env.STELLAR_NETWORK === 'TESTNET'
 
@@ -180,10 +182,16 @@ export const auth = async (event, context) => {
         jti: transaction.hash().toString('hex')
       }, process.env.JWT_SECRET)
 
+      const uri = TransactionStellarUri.forTransaction( new StellarSdk.Transaction(xdr) )
+      uri.msg = 'StellarAuth transaction'
+      uri.originDomain = 'stellarauth.com'
+      uri.addSignature(source)
+
       return {
         statusCode: 200,
         headers,
         body: JSON.stringify({
+          uri: uri.toString(),
           transaction: xdr,
           auth
         })
@@ -207,7 +215,7 @@ export const auth = async (event, context) => {
     : err
 
     console.error(error)
-    // console.error(err)
+    console.error(err)
 
     return {
       statusCode: error.status || err.status || 400,

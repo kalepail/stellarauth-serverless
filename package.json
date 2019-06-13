@@ -20,6 +20,7 @@
     "webpack-node-externals": "^1.7.2"
   },
   "dependencies": {
+    "@stellarguard/stellar-uri": "^1.0.0",
     "axios": "^0.18.0",
     "bluebird": "^3.5.4",
     "crypto": "^1.0.1",

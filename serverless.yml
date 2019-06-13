@@ -22,7 +22,7 @@ custom:
 
 provider:
   name: aws
-  runtime: nodejs8.10
+  runtime: nodejs10.x
   stage: ${opt:stage}
   region: us-east-1
   environment: ${file(env.yml):${opt:stage}}

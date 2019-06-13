@@ -635,6 +635,11 @@
     lodash "^4.17.11"
     to-fast-properties "^2.0.0"
 
+"@stellarguard/stellar-uri@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@stellarguard/stellar-uri/-/stellar-uri-1.0.0.tgz#0405b9ef737bbf94c54c7e0a8d53ccba0067289c"
+  integrity sha512-+ckUcX7odnsl9oDnyn/zk66zmO25A7NOGNcYU0ducQh2WriTF9PUtN9wHzaGWqkK2ZCGUMcxs8cGjEuy97tRaQ==
+
 "@types/node@>= 8":
   version "12.0.2"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-12.0.2.tgz#3452a24edf9fea138b48fad4a0a028a683da1e40"
