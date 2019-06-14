@@ -183,6 +183,7 @@ export const auth = async (event, context) => {
       }, process.env.JWT_SECRET)
 
       const uri = TransactionStellarUri.forTransaction(transaction)
+      // uri.msg = 'StellarAuth transaction' // Add back once cosmic link supports it
       uri.originDomain = 'stellarauth.com'
       uri.networkPassphrase = StellarSdk.Networks[process.env.STELLAR_NETWORK]
       uri.addSignature(source)
@@ -191,7 +192,7 @@ export const auth = async (event, context) => {
         statusCode: 200,
         headers,
         body: JSON.stringify({
-          uri: uri.toString().replace(/\+/g, '%20'),
+          uri: uri.toString().replace(/\+/g, '%20'), // Remove replace once cosmic link supports `+` as a space separator
           transaction: xdr,
           auth
         })
