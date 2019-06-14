@@ -182,8 +182,7 @@ export const auth = async (event, context) => {
         jti: transaction.hash().toString('hex')
       }, process.env.JWT_SECRET)
 
-      const uri = TransactionStellarUri.forTransaction( new StellarSdk.Transaction(xdr) )
-      uri.msg = 'StellarAuth transaction'
+      const uri = TransactionStellarUri.forTransaction(xdr)
       uri.originDomain = 'stellarauth.com'
       uri.networkPassphrase = StellarSdk.Networks[process.env.STELLAR_NETWORK]
       uri.addSignature(source)
