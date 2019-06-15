@@ -151,7 +151,11 @@ export const auth = async (event, context) => {
             timebounds: {
               minTime: date.format('X'),
               maxTime: date.add(q_ttl, 'seconds').format('X')
-            }
+            },
+            memo: new StellarSdk.Memo(
+              StellarSdk.MemoText, 
+              'StellarAuth transaction'
+            )
           }
         )
         .addOperation(StellarSdk.Operation.payment({
