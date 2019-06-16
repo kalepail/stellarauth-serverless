@@ -183,7 +183,8 @@ export const auth = async (event, context) => {
           date.add(q_ttl, 'seconds').format('X'), 
           10
         ),
-        jti: transaction.hash().toString('hex')
+        jti: transaction.hash().toString('hex'),
+        nwk: isTestnet ? 'test' : 'public'
       }, process.env.JWT_SECRET)
 
       const uri = TransactionStellarUri.forTransaction(transaction)
