@@ -188,6 +188,8 @@ export const auth = async (event, context) => {
 
       const uri = TransactionStellarUri.forTransaction(transaction)
       // uri.msg = 'StellarAuth transaction' // Add back once cosmic link supports it
+      // uri.callback = 'https://stellarauth.com'
+      // uri.pubkey = q_account
       uri.originDomain = 'stellarauth.com'
       uri.networkPassphrase = StellarSdk.Networks[process.env.STELLAR_NETWORK]
       uri.addSignature(source)
