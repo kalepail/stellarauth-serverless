@@ -4,6 +4,8 @@ import axios from 'axios'
 import moment from 'moment'
 import jwt from 'jsonwebtoken'
 import bluebird from 'bluebird'
+import crypto from 'crypto'
+import shajs from 'sha.js'
 
 import { TransactionStellarUri } from '@stellarguard/stellar-uri'
 
@@ -43,7 +45,7 @@ export const auth = async (event, context) => {
       else
         throw 'Authorization header malformed'
 
-      const {jti} = await jwt.verify(h_auth, process.env.JWT_SECRET)
+      const {jti, token} = await jwt.verify(h_auth, process.env.JWT_SECRET)
       const transaction = await axios
       .get(`${process.env.HORIZON_URL}/transactions/${jti}`)
       .catch((err) => {
@@ -53,7 +55,15 @@ export const auth = async (event, context) => {
       .then(({data}) => {
         if (
           _.filter(data.operations, (operation) => operation.source && operation.source === source.publicKey()).length
-        ) throw 'Transaction contains unauthorized operations' 
+        ) throw 'Transaction contains unauthorized operations'
+
+        if (
+          !data.memo
+          || Buffer.compare(
+            shajs('sha256').update(token).digest(), 
+            Buffer.from(data.memo, 'base64')
+          ) !== 0
+        ) throw 'Transaction memo hash and token don\'t match'
 
         if (moment().isAfter(data.valid_before)) throw {
           status: 401,
@@ -63,7 +73,6 @@ export const auth = async (event, context) => {
         return _.omit(data, [
           '_links',
           'fee_meta_xdr',
-          'memo_type',
           'result_meta_xdr',
           'result_xdr',
           'envelope_xdr',
@@ -123,6 +132,8 @@ export const auth = async (event, context) => {
       }))
 
       const date = moment().subtract(5, 'seconds')
+      const token = crypto.randomBytes(64).toString('hex')
+      const memo = shajs('sha256').update(token).digest()
 
       // Otherwise generate a new one
       const transaction = await server
@@ -153,8 +164,8 @@ export const auth = async (event, context) => {
               maxTime: date.add(q_ttl, 'seconds').format('X')
             },
             memo: new StellarSdk.Memo(
-              StellarSdk.MemoText, 
-              'StellarAuth transaction'
+              StellarSdk.MemoHash, 
+              memo
             )
           }
         )
@@ -184,7 +195,9 @@ export const auth = async (event, context) => {
           10
         ),
         jti: transaction.hash().toString('hex'),
-        nwk: isTestnet ? 'test' : 'public'
+
+        network: isTestnet ? 'test' : 'public',
+        token
       }, process.env.JWT_SECRET)
 
       const uri = TransactionStellarUri.forTransaction(transaction)
