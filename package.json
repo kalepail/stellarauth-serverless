@@ -28,7 +28,9 @@
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.11",
     "moment": "^2.24.0",
+    "pg": "^7.11.0",
     "sha.js": "^2.4.11",
+    "sjcl": "^1.0.8",
     "source-map-support": "^0.5.12",
     "stellar-sdk": "^1.0.2"
   }

@@ -35,3 +35,34 @@ functions:
           path: auth
           method: get
           cors: true
+
+  app:
+    handler: handler.app
+    events:
+      - http:
+          path: app
+          method: POST
+          cors: true
+  
+  keyCreate:
+    handler: handler.key
+    events:
+      - http:
+          path: key/create
+          method: POST
+          cors: true
+  keyClaim:
+    handler: handler.key
+    events:
+      - http:
+          path: key/claim
+          method: POST
+          cors: true
+
+  user:
+    handler: handler.user
+    events:
+      - http:
+          path: user
+          method: POST
+          cors: true
