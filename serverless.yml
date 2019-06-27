@@ -37,7 +37,7 @@ functions:
   #         method: get
   #         cors: true
 
-  createApp:
+  appCreate:
     handler: handler.app
     events:
       - http:
@@ -45,7 +45,7 @@ functions:
           method: POST
           cors: true
 
-  createUser:
+  userCreate:
     handler: handler.user
     events:
       - http:
