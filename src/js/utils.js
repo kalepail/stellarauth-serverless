@@ -39,3 +39,5 @@ export function parseError(err) {
     body: JSON.stringify(error)
   }
 }
+
+export const masterKeypair = StellarSdk.Keypair.fromSecret(process.env.CRYPT_KEY)

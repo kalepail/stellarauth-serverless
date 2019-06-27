@@ -36,7 +36,7 @@ functions:
           method: get
           cors: true
 
-  app:
+  createApp:
     handler: handler.app
     events:
       - http:
@@ -58,8 +58,22 @@ functions:
           path: key/claim
           method: POST
           cors: true
+  keyVerify:
+    handler: handler.key
+    events:
+      - http:
+          path: key/verify
+          method: POST
+          cors: true
+  keyCheck:
+    handler: handler.key
+    events:
+      - http:
+          path: key/check
+          method: GET
+          cors: true
 
-  user:
+  createUser:
     handler: handler.user
     events:
       - http:

@@ -1,9 +1,7 @@
-import { headers, StellarSdk, parseError } from './js/utils'
+import { headers, StellarSdk, parseError, masterKeypair } from './js/utils'
 import { Pool } from './js/pg'
 import sjcl from 'sjcl'
 import _ from 'lodash'
-
-// TODO: use multisig to pass the key from the app to the user?
 
 const create = (event, context) => {
   try {
@@ -22,9 +20,10 @@ const create = (event, context) => {
 
     const encrypted = Buffer.from(
       sjcl.encrypt(
-        process.env.CRYPT_KEY,
+        masterKeypair.secret() + appKeypair.secret(),
         keyKeypair.secret(),
         {adata: JSON.stringify({
+          master: masterKeypair.publicKey(),
           app: appKeypair.publicKey(),
           key: keyKeypair.publicKey()
         })}
@@ -35,6 +34,7 @@ const create = (event, context) => {
       statusCode: 200,
       headers,
       body: JSON.stringify({
+        master: masterKeypair.publicKey(),
         app: appKeypair.publicKey(),
         key: keyKeypair.publicKey(),
         token: encrypted
@@ -60,14 +60,6 @@ const claim = async (event, context) => {
     else
       throw 'Authorization header malformed'
 
-    const keySecret = sjcl.decrypt(
-      process.env.CRYPT_KEY,
-      Buffer.from(b_token, 'base64').toString()
-    )
-
-    const keyKeypair = StellarSdk.Keypair.fromSecret(keySecret)
-    const userKeypair = StellarSdk.Keypair.fromSecret(h_auth)
-
     const data = JSON.parse(
       Buffer.from(
         _.get(
@@ -83,23 +75,11 @@ const claim = async (event, context) => {
       ).toString()
     )
 
-    const encrypted = Buffer.from(
-      sjcl.encrypt(
-        userKeypair.secret(),
-        keyKeypair.secret(),
-        {adata: JSON.stringify({
-          app: data.app,
-          user: userKeypair.publicKey(),
-          key: data.key
-        })}
-      )
-    ).toString('base64')
-
-    data.user = userKeypair.publicKey()
+    data.user = h_auth
 
     const result = await Pool.query(`
-      insert into keys (_app, _user, _key, token)
-      values ('${data.app}', '${data.user}', '${data.key}', '${encrypted}')
+      insert into keys (_master, _app, _user, _key, token)
+      values ('${data.master}', '${data.app}', '${data.user}', '${data.key}', '${b_token}')
     `)
 
     return {
@@ -114,13 +94,103 @@ const claim = async (event, context) => {
   }
 }
 
-// const get = async (event, context) => {
-//   return {
-//     statusCode: 200,
-//     headers,
-//     body: JSON.stringify({ message: 'Hello' })
-//   }
-// }
+const verify = async (event, context) => {
+  try {
+    const b_token = _.get(JSON.parse(event.body), 'token')
+    let h_auth = _.get(event, 'headers.Authorization', _.get(event, 'headers.authorization'))
+
+    if (
+      h_auth
+      && h_auth.substring(0, 7) === 'Bearer '
+    ) h_auth = h_auth.replace('Bearer ', '')
+
+    else
+      throw 'Authorization header malformed'
+
+    const appKeypair = StellarSdk.Keypair.fromSecret(h_auth)
+    const keyKeypair = StellarSdk.Keypair.fromSecret(
+      sjcl.decrypt(
+        masterKeypair.secret() + appKeypair.secret(),
+        Buffer.from(b_token, 'base64').toString()
+      )
+    )
+
+    const result = await Pool.query(`
+      select * from keys
+      where _key='${keyKeypair.publicKey()}'
+    `)
+
+    const userPublicKey = new sjcl.ecc.elGamal.publicKey(
+      sjcl.ecc.curves.c256, 
+      sjcl.codec.base64.toBits(_.get(result, 'rows[0]._user'))
+    )
+
+    const encrypted = Buffer.from(
+      sjcl.encrypt(userPublicKey, keyKeypair.secret())
+    ).toString('base64')
+
+    await Pool.query(`
+      update keys set
+      token='${encrypted}'
+      where _key='${keyKeypair.publicKey()}'
+    `)
+
+    return {
+      statusCode: 200,
+      headers
+    }
+  }
+
+  catch(err) {
+    return parseError(err)
+  }
+}
+
+const get = async (event, context) => {
+  try {
+    const q_key = _.get(event.queryStringParameters, 'key')
+    let h_auth = _.get(event, 'headers.Authorization', _.get(event, 'headers.authorization'))
+
+    if (
+      h_auth
+      && h_auth.substring(0, 7) === 'Bearer '
+    ) h_auth = h_auth.replace('Bearer ', '')
+
+    else
+      throw 'Authorization header malformed'
+
+    const result = await Pool.query(`
+      select * from keys
+      where _key='${q_key}'
+    `)
+    const token = _.get(result, 'rows[0].token')
+
+    const userSecretKey = new sjcl.ecc.elGamal.secretKey(
+      sjcl.ecc.curves.c256,
+      sjcl.ecc.curves.c256.field.fromBits(sjcl.codec.base64.toBits(h_auth))
+    )
+
+    const keyKeypair = StellarSdk.Keypair.fromSecret(
+      sjcl.decrypt(
+        userSecretKey,
+        Buffer.from(token, 'base64').toString()
+      )
+    )
+
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        publicKey: keyKeypair.publicKey(),
+        secret: keyKeypair.secret()
+      })
+    }
+  }
+
+  catch(err) {
+    return parseError(err)
+  }
+}
 
 const post = async (event, context) => {
   switch (event.path) {
@@ -129,6 +199,9 @@ const post = async (event, context) => {
 
     case '/key/claim':
     return claim(event, context)
+
+    case '/key/verify':
+    return verify(event, context)
 
     default:
     return {
@@ -143,8 +216,8 @@ export default (event, context, callback) => {
   context.callbackWaitsForEmptyEventLoop = false
 
   switch (event.httpMethod) {
-    // case 'GET':
-    // return get(event, context)
+    case 'GET':
+    return get(event, context)
 
     case 'POST':
     return post(event, context)

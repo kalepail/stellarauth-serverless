@@ -30,7 +30,7 @@
     "moment": "^2.24.0",
     "pg": "^7.11.0",
     "sha.js": "^2.4.11",
-    "sjcl": "^1.0.8",
+    "sjcl": "https://github.com/tyvdh/sjcl.git",
     "source-map-support": "^0.5.12",
     "stellar-sdk": "^1.0.2"
   }

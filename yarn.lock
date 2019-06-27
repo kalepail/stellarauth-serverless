@@ -3715,10 +3715,9 @@ signal-exit@^3.0.0:
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.2.tgz#b5fdc08f1287ea1178628e415e25132b73646c6d"
   integrity sha1-tf3AjxKH6hF4Yo5BXiUTK3NkbG0=
 
-sjcl@^1.0.8:
+"sjcl@https://github.com/tyvdh/sjcl.git":
   version "1.0.8"
-  resolved "https://registry.yarnpkg.com/sjcl/-/sjcl-1.0.8.tgz#f2ec8d7dc1f0f21b069b8914a41a8f236b0e252a"
-  integrity sha512-LzIjEQ0S0DpIgnxMEayM1rq9aGwGRG4OnZhCdjx7glTaJtf4zRfpg87ImfjSJjoW9vKpagd82McDOwbRT5kQKQ==
+  resolved "https://github.com/tyvdh/sjcl.git#8ab4e38b7b45119b3b40919f6234b88054c8a01d"
 
 snapdragon-node@^2.0.1:
   version "2.1.1"
