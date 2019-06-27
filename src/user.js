@@ -21,8 +21,10 @@ const post = async (event, context) => {
     statusCode: 200,
     headers,
     body: JSON.stringify({
-      pub,
-      sec
+      user: {
+        pub,
+        sec
+      }
     })
   }
 }

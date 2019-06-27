@@ -2,6 +2,7 @@ import { headers, StellarSdk, parseError, masterKeypair } from './js/utils'
 import { Pool } from './js/pg'
 import sjcl from 'sjcl'
 import _ from 'lodash'
+import shajs from 'sha.js'
 
 const create = (event, context) => {
   try {
@@ -20,7 +21,7 @@ const create = (event, context) => {
 
     const encrypted = Buffer.from(
       sjcl.encrypt(
-        masterKeypair.secret() + appKeypair.secret(),
+        shajs('sha256').update(masterKeypair.secret() + appKeypair.secret()).digest('hex'),
         keyKeypair.secret(),
         {adata: JSON.stringify({
           master: masterKeypair.publicKey(),
@@ -110,7 +111,7 @@ const verify = async (event, context) => {
     const appKeypair = StellarSdk.Keypair.fromSecret(h_auth)
     const keyKeypair = StellarSdk.Keypair.fromSecret(
       sjcl.decrypt(
-        masterKeypair.secret() + appKeypair.secret(),
+        shajs('sha256').update(masterKeypair.secret() + appKeypair.secret()).digest('hex'),
         Buffer.from(b_token, 'base64').toString()
       )
     )
