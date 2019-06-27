@@ -9,14 +9,14 @@ import { TransactionStellarUri } from '@stellarguard/stellar-uri'
 import { headers, isDev, isTestnet, server, source, StellarSdk } from './js/utils'
 
 export default async (event, context) => {
-  let h_auth = _.get(event, 'headers.Authorization', _.get(event, 'headers.authorization'))
-  const q_account = _.get(event, 'queryStringParameters.account')
-  const q_ttl = parseInt(
-    _.get(event, 'queryStringParameters.ttl', 3600),
-    10
-  )
-
   try {
+    let h_auth = _.get(event, 'headers.Authorization', _.get(event, 'headers.authorization'))
+    const q_account = _.get(event, 'queryStringParameters.account')
+    const q_ttl = parseInt(
+      _.get(event, 'queryStringParameters.ttl', 3600),
+      10
+    )
+    
     if (q_ttl < 60)
       throw 'TTL (time to live) must be at least 60 seconds'
 

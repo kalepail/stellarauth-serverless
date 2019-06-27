@@ -1,22 +1,34 @@
-import { headers, StellarSdk } from './js/utils'
+import { headers, StellarSdk, parseError } from './js/utils'
 
 // const get = async (event, context) => {
-//   return {
-//     statusCode: 200,
-//     headers,
-//     body: JSON.stringify({ message: 'Hello' })
+//   try {
+//     return {
+//       statusCode: 200,
+//       headers,
+//       body: JSON.stringify({})
+//     }
+//   }
+
+//   catch(err) {
+//     return parseError(err)
 //   }
 // }
 
 const post = async (event, context) => {
-  const keypair = StellarSdk.Keypair.random()
+  try {
+    const keypair = StellarSdk.Keypair.random()
 
-  return {
-    statusCode: 200,
-    headers,
-    body: JSON.stringify({
-      app: keypair.secret()
-    })
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        app: keypair.secret()
+      })
+    }
+  }
+
+  catch(err) {
+    return parseError(err)
   }
 }
 

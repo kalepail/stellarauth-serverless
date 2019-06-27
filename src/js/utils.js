@@ -1,4 +1,5 @@
 import * as _StellarSdk from 'stellar-sdk'
+import _ from 'lodash'
 
 export const headers = {
   'Access-Control-Allow-Origin': '*'
@@ -31,7 +32,7 @@ export function parseError(err) {
   : err
 
   console.error(error)
-  // console.error(err)
+  console.error(err)
 
   return {
     statusCode: error.status || err.status || 400,
@@ -41,3 +42,17 @@ export function parseError(err) {
 }
 
 export const masterKeypair = StellarSdk.Keypair.fromSecret(process.env.CRYPT_KEY)
+
+export function getAuth(event) {
+  let h_auth = _.get(event, 'headers.Authorization', _.get(event, 'headers.authorization'))
+
+  if (
+    h_auth
+    && h_auth.substring(0, 7) === 'Bearer '
+  ) h_auth = h_auth.replace('Bearer ', '')
+
+  else
+    throw 'Authorization header malformed'
+
+  return h_auth
+}

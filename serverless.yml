@@ -43,6 +43,14 @@ functions:
           path: app
           method: POST
           cors: true
+
+  createUser:
+    handler: handler.user
+    events:
+      - http:
+          path: user
+          method: POST
+          cors: true
   
   keyCreate:
     handler: handler.key
@@ -65,18 +73,32 @@ functions:
           path: key/verify
           method: POST
           cors: true
-  keyCheck:
+  keyValidate:
     handler: handler.key
     events:
       - http:
-          path: key/check
-          method: GET
+          path: key/validate
+          method: POST
           cors: true
 
-  createUser:
-    handler: handler.user
+  txnSend:
+    handler: handler.txn
     events:
       - http:
-          path: user
+          path: txn/send
           method: POST
+          cors: true
+  txnSign:
+    handler: handler.txn
+    events:
+      - http:
+          path: txn/sign
+          method: POST
+          cors: true
+  txnList:
+    handler: handler.txn
+    events:
+      - http:
+          path: txn
+          method: GET
           cors: true
