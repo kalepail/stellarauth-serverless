@@ -1,21 +1,22 @@
 tenant: tyvdh
 app: stellarauth
-service: stellarauth
+service: stellarauth-full
 
 plugins:
   - serverless-webpack
   - serverless-offline
-  - serverless-domain-manager
+  # - serverless-domain-manager
 
 custom:
-  customDomain:
-    domainName: ${opt:subdomain}.stellarauth.com
-    certificateName: ${opt:subdomain}.stellarauth.com
-    stage: ${opt:stage}
-    createRoute53Record: false
+  # customDomain:
+  #   domainName: ${opt:subdomain}.stellarauth.com
+  #   certificateName: ${opt:subdomain}.stellarauth.com
+  #   stage: ${opt:stage}
+  #   createRoute53Record: false
   webpack:
     webpackConfig: ./webpack.config.js
     includeModules: true
+    packager: yarn
   serverless-offline:
     httpsProtocol: certs
     port: 4000
@@ -28,13 +29,13 @@ provider:
   environment: ${file(env.yml):${opt:stage}}
 
 functions:
-  auth:
-    handler: handler.auth
-    events:
-      - http:
-          path: auth
-          method: get
-          cors: true
+  # auth:
+  #   handler: handler.auth
+  #   events:
+  #     - http:
+  #         path: auth
+  #         method: get
+  #         cors: true
 
   createApp:
     handler: handler.app
