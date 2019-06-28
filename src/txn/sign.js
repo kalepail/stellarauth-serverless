@@ -34,6 +34,12 @@ export default async (event, context) => {
 
     const result = await server.submitTransaction(txn)
 
+    await Pool.query(`
+      update txns set
+      status='signed'
+      where xdr='${b_xdr}'
+    `)
+
     return {
       statusCode: 200,
       headers,

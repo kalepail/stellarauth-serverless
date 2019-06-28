@@ -17,8 +17,8 @@ export default async (event, context) => {
     `).then((data) => _.get(data, 'rows[0]'))
 
     await Pool.query(`
-      insert into txns (_master, _app, _user, _key, xdr)
-      values ('${pgKey._master}', '${pgKey._app}', '${pgKey._user}', '${pgKey._key}', '${b_xdr}')
+      insert into txns (_master, _app, _user, _key, status, xdr)
+      values ('${pgKey._master}', '${pgKey._app}', '${pgKey._user}', '${pgKey._key}', 'sent', '${b_xdr}')
     `)
 
     if (pgKey)
