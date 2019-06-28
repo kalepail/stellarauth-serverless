@@ -6,12 +6,13 @@ import shajs from 'sha.js'
 
 export default async (event, context) => {
   try {
-    const b_xdr = _.get(JSON.parse(event.body), 'xdr')
+    const b_txn = _.get(JSON.parse(event.body), 'txn')
     const h_auth = getAuth(event)
 
     const pgTxn = await Pool.query(`
       select * from txns
-      where xdr='${b_xdr}'
+      where _txn='${b_txn}'
+      and status='sent'
     `).then((data) => _.get(data, 'rows[0]'))
 
     const pgKey = await Pool.query(`
@@ -28,17 +29,29 @@ export default async (event, context) => {
       )
     )
 
-    const txn = new StellarSdk.Transaction(b_xdr)
+    const txn = new StellarSdk.Transaction(pgTxn.xdr)
         
     txn.sign(keyKeypair)
 
-    const result = await server.submitTransaction(txn)
-
     await Pool.query(`
       update txns set
-      status='signed'
-      where xdr='${b_xdr}'
+      status='signed',
+      xdr='${txn.toXDR()}'
+      where _txn='${b_txn}'
     `)
+
+    const result = await server
+    .submitTransaction(txn)
+    .then(async (data) => {
+      await Pool.query(`
+        update txns set
+        status='submitted',
+        xdr='${txn.toXDR()}'
+        where _txn='${b_txn}'
+      `)
+
+      return data
+    })
 
     return {
       statusCode: 200,

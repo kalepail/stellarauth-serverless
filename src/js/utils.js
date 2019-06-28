@@ -36,7 +36,7 @@ export function parseError(err) {
   : err
 
   console.error(error)
-  console.error(err)
+  // console.error(err)
 
   return {
     statusCode: error.status || err.status || 400,
