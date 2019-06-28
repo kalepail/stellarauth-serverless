@@ -1,35 +1,20 @@
-import { headers, getAuth, parseError, StellarSdk } from './js/utils'
-import { Pool } from './js/pg'
-import _ from 'lodash'
+import { headers } from './js/utils'
 
 import send from './txn/send'
 import sign from './txn/sign'
+import list from './txn/list'
 
 const get = async (event, context) => {
-  try {
-    const h_auth = getAuth(event)
+  switch (event.path) {
+    case '/txn/list':
+    return list(event, context)
 
-    const userKeypair = StellarSdk.Keypair.fromSecret(h_auth)
-
-    const pgTxns = await Pool.query(`
-        select * from txns
-        where _user='${userKeypair.publicKey()}'
-      `).then((data) => _
-        .chain(data)
-        .get('rows')
-        .map('xdr')
-        .value()
-      )
-
+    default:
     return {
-      statusCode: 200,
+      statusCode: 500,
       headers,
-      body: JSON.stringify({ txns: pgTxns })
+      body: JSON.stringify({ message: 'Route not supported' })
     }
-  }
-
-  catch(err) {
-    return parseError(err)
   }
 }
 
