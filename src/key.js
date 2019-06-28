@@ -3,21 +3,21 @@ import { headers } from './js/utils'
 import create from './key/create'
 import claim from './key/claim'
 import verify from './key/verify'
-import validate from './key/validate'
+import check from './key/check'
 
-// const get = async (event, context) => {
-//   try {
-//     return {
-//       statusCode: 200,
-//       headers,
-//       body: JSON.stringify({})
-//     }
-//   }
+const get = async (event, context) => {
+  switch (event.path) {
+    case '/key/check':
+    return check(event, context)
 
-//   catch(err) {
-//     return parseError(err)
-//   }
-// }
+    default:
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ message: 'Route not supported' })
+    }
+  }
+}
 
 const post = async (event, context) => {
   switch (event.path) {
@@ -29,9 +29,6 @@ const post = async (event, context) => {
 
     case '/key/verify':
     return verify(event, context)
-
-    case '/key/validate':
-    return validate(event, context)
 
     default:
     return {
@@ -46,8 +43,8 @@ export default (event, context, callback) => {
   context.callbackWaitsForEmptyEventLoop = false
 
   switch (event.httpMethod) {
-    // case 'GET':
-    // return get(event, context)
+    case 'GET':
+    return get(event, context)
 
     case 'POST':
     return post(event, context)

@@ -74,12 +74,12 @@ functions:
           path: key/verify
           method: POST
           cors: true
-  keyValidate:
+  keyCheck:
     handler: handler.key
     events:
       - http:
-          path: key/validate
-          method: POST
+          path: key/check
+          method: GET
           cors: true
 
   txnSend:

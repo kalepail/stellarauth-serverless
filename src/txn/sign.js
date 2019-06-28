@@ -19,19 +19,19 @@ export default async (event, context) => {
       where _key='${pgTxn._key}'
     `).then((data) => _.get(data, 'rows[0]'))
 
-    const userSecretKey = new sjcl.ecc.elGamal.secretKey(
-      sjcl.ecc.curves.c256,
-      sjcl.ecc.curves.c256.field.fromBits(sjcl.codec.base64.toBits(h_auth))
-    )
+    const userKeypair = StellarSdk.Keypair.fromSecret(h_auth)
+
+    const masterUserSecret = sjcl.codec.base64.toBits(shajs('sha256').update(masterKeypair.secret() + userKeypair.secret()).digest('base64'))
+    const masterUserKeyPair = sjcl.ecc.elGamal.generateKeys(256, 6, masterUserSecret)
 
     const keyKeypair = StellarSdk.Keypair.fromSecret(
       sjcl.decrypt(
-        shajs('sha256').update(masterKeypair.secret() + userSecretKey).digest('hex'),
-        Buffer.from(pgKey.token, 'base64').toString()
+        masterUserKeyPair.sec,
+        Buffer.from(pgKey.cipher, 'base64').toString()
       )
     )
 
-    let txn = new StellarSdk.Transaction(b_xdr)
+    const txn = new StellarSdk.Transaction(b_xdr)
         
     txn.sign(keyKeypair)
 

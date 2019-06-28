@@ -41,7 +41,7 @@ export function parseError(err) {
   }
 }
 
-export const masterKeypair = StellarSdk.Keypair.fromSecret(process.env.CRYPT_KEY)
+export const masterKeypair = StellarSdk.Keypair.fromSecret(process.env.MASTER_SECRET)
 
 export function getAuth(event) {
   let h_auth = _.get(event, 'headers.Authorization', _.get(event, 'headers.authorization'))
