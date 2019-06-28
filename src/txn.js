@@ -18,7 +18,7 @@ const get = async (event, context) => {
   }
 }
 
-const post = (event, context) => {
+const post = async (event, context) => {
   switch (event.path) {
     case '/txn/send':
     return send(event, context)

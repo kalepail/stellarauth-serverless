@@ -1,4 +1,4 @@
-import { headers, parseError, getAuth, masterKeypair, StellarSdk } from '../js/utils'
+import { headers, parseError, getAuth, masterKeypair, StellarSdk, getMasterUserKeypair } from '../js/utils'
 import { Pool } from '../js/pg'
 import _ from 'lodash'
 import sjcl from 'sjcl'
@@ -24,13 +24,7 @@ export default async (event, context) => {
       ).toString()
     )
 
-    const userKeypair = StellarSdk.Keypair.fromSecret(h_auth)
-
-    const masterUserSecret = sjcl.codec.base64.toBits(shajs('sha256').update(masterKeypair.secret() + userKeypair.secret()).digest('base64'))
-    const masterUserKeyPair = sjcl.ecc.elGamal.generateKeys(256, 6, masterUserSecret)
-
-    let masterUserPublic = masterUserKeyPair.pub.get()
-        masterUserPublic = sjcl.codec.base64.fromBits(masterUserPublic.x.concat(masterUserPublic.y))
+    const { masterUserPublic, userKeypair } = getMasterUserKeypair(h_auth)
 
     await Pool.query(`
       insert into keys (_master, _app, _user, upkey, _key, cipher)

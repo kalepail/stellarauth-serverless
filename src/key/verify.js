@@ -23,7 +23,7 @@ export default async (event, context) => {
       )
     )
 
-    let masterUserPublic = new sjcl.ecc.elGamal.publicKey(
+    const masterUserPublic = new sjcl.ecc.elGamal.publicKey(
       sjcl.ecc.curves.c256, 
       sjcl.codec.base64.toBits(pgKey.upkey)
     )
@@ -37,7 +37,8 @@ export default async (event, context) => {
 
     await Pool.query(`
       update keys set
-      cipher='${encrypted}'
+      cipher='${encrypted}',
+      upkey=NULL
       where _key='${keyKeypair.publicKey()}'
     `)
 

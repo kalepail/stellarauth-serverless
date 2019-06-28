@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { server, headers, StellarSdk, parseError, getAuth, masterKeypair } from '../js/utils'
+import { server, headers, StellarSdk, parseError, getAuth, masterKeypair, getMasterUserKeypair } from '../js/utils'
 import { Pool } from '../js/pg'
 import sjcl from 'sjcl'
 import shajs from 'sha.js'
@@ -19,14 +19,11 @@ export default async (event, context) => {
       where _key='${pgTxn._key}'
     `).then((data) => _.get(data, 'rows[0]'))
 
-    const userKeypair = StellarSdk.Keypair.fromSecret(h_auth)
-
-    const masterUserSecret = sjcl.codec.base64.toBits(shajs('sha256').update(masterKeypair.secret() + userKeypair.secret()).digest('base64'))
-    const masterUserKeyPair = sjcl.ecc.elGamal.generateKeys(256, 6, masterUserSecret)
+    const { masterUserKeypair } = getMasterUserKeypair(h_auth)
 
     const keyKeypair = StellarSdk.Keypair.fromSecret(
       sjcl.decrypt(
-        masterUserKeyPair.sec,
+        masterUserKeypair.sec,
         Buffer.from(pgKey.cipher, 'base64').toString()
       )
     )
