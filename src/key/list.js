@@ -8,16 +8,16 @@ export default async (event, context) => {
 
     const userKeypair = StellarSdk.Keypair.fromSecret(h_auth)
 
-    const pgTxns = await Pool.query(`
-        select * from txns
+    const pgKeys = await Pool.query(`
+        select * from keys
         where _user='${userKeypair.publicKey()}'
         -- and status='sent'
       `).then((data) => _
         .chain(data)
         .get('rows')
-        .map((txn) => ({
-          _txn: txn._txn,
-          status: txn.status
+        .map((key) => ({
+          _key: key._key,
+          verified: !key.upkey
         }))
         .value()
       )
@@ -25,7 +25,7 @@ export default async (event, context) => {
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ txns: pgTxns })
+      body: JSON.stringify({ keys: pgKeys })
     }
   }
 

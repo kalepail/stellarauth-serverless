@@ -8,22 +8,22 @@
     "deploy:prod": "sls deploy --stage prod --subdomain api"
   },
   "devDependencies": {
-    "@babel/core": "^7.4.4",
+    "@babel/core": "^7.4.5",
     "@babel/plugin-transform-runtime": "^7.4.4",
-    "@babel/preset-env": "^7.4.4",
-    "@babel/runtime": "^7.4.4",
+    "@babel/preset-env": "^7.4.5",
+    "@babel/runtime": "^7.4.5",
     "babel-loader": "^8.0.6",
     "babel-plugin-source-map-support": "^2.0.1",
-    "serverless-domain-manager": "^3.2.2",
-    "serverless-offline": "4.10.0",
-    "serverless-webpack": "^5.3.0",
-    "webpack": "^4.31.0",
+    "serverless-domain-manager": "^3.2.6",
+    "serverless-offline": "5.5.0",
+    "serverless-webpack": "^5.3.1",
+    "webpack": "^4.35.0",
     "webpack-node-externals": "^1.7.2"
   },
   "dependencies": {
     "@stellarguard/stellar-uri": "^1.0.0",
-    "axios": "^0.18.0",
-    "bluebird": "^3.5.4",
+    "axios": "^0.19.0",
+    "bluebird": "^3.5.5",
     "crypto": "^1.0.1",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.11",
@@ -32,6 +32,6 @@
     "sha.js": "^2.4.11",
     "sjcl": "https://github.com/tyvdh/sjcl.git",
     "source-map-support": "^0.5.12",
-    "stellar-sdk": "^1.0.2"
+    "stellar-sdk": "^1.0.5"
   }
 }

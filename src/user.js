@@ -22,7 +22,7 @@ const post = async (event, context) => {
       statusCode: 200,
       headers,
       body: JSON.stringify({
-        app: keypair.secret()
+        user: keypair.secret()
       })
     }
   }

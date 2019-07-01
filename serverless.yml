@@ -81,6 +81,13 @@ functions:
           path: key/check
           method: GET
           cors: true
+  keyList:
+    handler: handler.key
+    events:
+      - http:
+          path: key/list
+          method: GET
+          cors: true
 
   txnSend:
     handler: handler.txn
