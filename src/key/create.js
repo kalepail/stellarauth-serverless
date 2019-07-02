@@ -2,7 +2,7 @@ import { headers, StellarSdk, parseError, masterKeypair, getAuth } from '../js/u
 import sjcl from 'sjcl'
 import shajs from 'sha.js'
 
-const create = (event, context) => {
+const create = async (event, context) => {
   try {
     const h_auth = getAuth(event)
 

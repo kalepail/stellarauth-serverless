@@ -110,3 +110,11 @@ functions:
           path: txn/list
           method: GET
           cors: true
+
+  imgShow:
+    handler: handler.img
+    events:
+      - http:
+          path: img/{token}
+          method: GET
+          cors: true
