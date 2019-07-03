@@ -17,7 +17,9 @@ export default async (event, context) => {
         .get('rows')
         .map((txn) => ({
           _txn: txn._txn,
-          status: txn.status
+          _key: txn._key,
+          status: txn.status,
+          xdr: txn.xdr
         }))
         .value()
       )
