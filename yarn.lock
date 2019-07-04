@@ -3825,6 +3825,11 @@ schema-utils@^1.0.0:
     ajv-errors "^1.0.0"
     ajv-keywords "^3.1.0"
 
+scrypt-async@^2.0.0:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/scrypt-async/-/scrypt-async-2.0.1.tgz#4318dae48a8b7cc3b8fe05f75f4164a7d973d25d"
+  integrity sha512-wHR032jldwZNy7Tzrfu7RccOgGf8r5hyDMSP2uV6DpLiBUsR8JsDcx/in73o2UGVVrH5ivRFdNsFPcjtl3LErQ==
+
 semver@4.3.2:
   version "4.3.2"
   resolved "https://registry.yarnpkg.com/semver/-/semver-4.3.2.tgz#c7a07158a80bedd052355b770d82d6640f803be7"
@@ -4061,7 +4066,17 @@ stellar-base@^1.0.2:
   optionalDependencies:
     sodium-native "^2.3.0"
 
-stellar-sdk@^1.0.5:
+stellar-keystore@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/stellar-keystore/-/stellar-keystore-2.0.1.tgz#7363554d6b8e3242fb15b1444fbdeedea5593536"
+  integrity sha512-yNVW/8500Bc/Mje19GY1HdkKidMkhHiU+/RImh/kB0VKuw5YMIgfVYTGLb+OX+nCFGrJXus6LLLWLZvlyxQAFw==
+  dependencies:
+    scrypt-async "^2.0.0"
+    stellar-sdk "^1.0.2"
+    tweetnacl "^1.0.1"
+    tweetnacl-util "^0.15.0"
+
+stellar-sdk@^1.0.2, stellar-sdk@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/stellar-sdk/-/stellar-sdk-1.0.5.tgz#85e17b25b2a9a65967a67f585787933e203b4191"
   integrity sha512-ytNHEWDc92vmv+wqI0lunS5MSfe7sS/t6x5jLAEKGZ203HqfltvRwyqV5v0FetcmG+GoXBf+N92LK+mx4vAWgw==
@@ -4341,7 +4356,12 @@ tty-browserify@0.0.0:
   resolved "https://registry.yarnpkg.com/tty-browserify/-/tty-browserify-0.0.0.tgz#a157ba402da24e9bf957f9aa69d524eed42901a6"
   integrity sha1-oVe6QC2iTpv5V/mqadUk7tQpAaY=
 
-tweetnacl@^1.0.0:
+tweetnacl-util@^0.15.0:
+  version "0.15.0"
+  resolved "https://registry.yarnpkg.com/tweetnacl-util/-/tweetnacl-util-0.15.0.tgz#4576c1cee5e2d63d207fee52f1ba02819480bc75"
+  integrity sha1-RXbBzuXi1j0gf+5S8boCgZSAvHU=
+
+tweetnacl@^1.0.0, tweetnacl@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/tweetnacl/-/tweetnacl-1.0.1.tgz#2594d42da73cd036bd0d2a54683dd35a6b55ca17"
   integrity sha512-kcoMoKTPYnoeS50tzoqjPY3Uv9axeuuFAZY9M/9zFnhoVvRfxz9K29IMPD7jGmt2c8SW7i3gT9WqDl2+nV7p4A==

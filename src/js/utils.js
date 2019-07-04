@@ -4,8 +4,7 @@ import sjcl from 'sjcl'
 import shajs from 'sha.js'
 
 export const headers = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Credentials': true
+  'Access-Control-Allow-Origin': '*'
 }
 
 export const isDev = process.env.NODE_ENV !== 'production'
