@@ -30,8 +30,6 @@ export default async (event, context) => {
     let qr = await qrcode.toDataURL(p_token)
         qr = qr.replace(/^data:image\/png;base64,/, '')
 
-    console.log(qr)
-
     return {
       statusCode: 200,
       headers: {
