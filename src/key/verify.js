@@ -1,8 +1,9 @@
 import { headers, StellarSdk, parseError, masterKeypair, getAuth } from '../js/utils'
-import { Pool } from '../js/pg'
+import Pool from '../js/pg'
 import sjcl from 'sjcl'
 import _ from 'lodash'
 import shajs from 'sha.js'
+import pusher from '../js/pusher'
 
 export default async (event, context) => {
   try {
@@ -25,7 +26,7 @@ export default async (event, context) => {
 
     const masterUserPublic = new sjcl.ecc.elGamal.publicKey(
       sjcl.ecc.curves.c256, 
-      sjcl.codec.base64.toBits(pgKey.upkey)
+      sjcl.codec.base64.toBits(pgKey.mupub)
     )
 
     const encrypted = Buffer.from(
@@ -38,9 +39,13 @@ export default async (event, context) => {
     await Pool.query(`
       update keys set
       cipher='${encrypted}',
-      upkey=NULL
+      mupub=NULL
       where _key='${keyKeypair.publicKey()}'
+      and _user='${pgKey._user}'
+      and _app='${appKeypair.publicKey()}'
     `)
+
+    pusher.trigger(pgKey._user, 'keyVerify', {})
 
     return {
       statusCode: 200,

@@ -1,6 +1,6 @@
-import { Pool as _Pool } from 'pg'
+import { Pool } from 'pg'
 
-export const Pool = new _Pool({
+export default new Pool({
   host: process.env.PG_HOST,
   port: process.env.PG_PORT,
   user: process.env.PG_USER,

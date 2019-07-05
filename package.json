@@ -30,6 +30,7 @@
     "lodash": "^4.17.11",
     "moment": "^2.24.0",
     "pg": "^7.11.0",
+    "pusher": "^2.2.1",
     "qrcode": "^1.3.3",
     "sha.js": "^2.4.11",
     "sjcl": "https://github.com/tyvdh/sjcl.git",

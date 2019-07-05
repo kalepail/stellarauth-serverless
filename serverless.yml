@@ -64,6 +64,13 @@ functions:
           path: key/create
           method: POST
           cors: true
+  keyUpdate:
+    handler: handler.key
+    events:
+      - http:
+          path: key/update
+          method: PUT
+          cors: true
   keyClaim:
     handler: handler.key
     events:

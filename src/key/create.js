@@ -1,9 +1,11 @@
 import { headers, StellarSdk, parseError, masterKeypair, getAuth } from '../js/utils'
 import sjcl from 'sjcl'
 import shajs from 'sha.js'
+import _ from 'lodash'
 
 const create = async (event, context) => {
   try {
+    const b_nickname = _.get(JSON.parse(event.body), 'nickname')
     const h_auth = getAuth(event)
 
     const appKeypair = StellarSdk.Keypair.fromSecret(h_auth)
@@ -16,7 +18,8 @@ const create = async (event, context) => {
         {adata: JSON.stringify({
           master: masterKeypair.publicKey(),
           app: appKeypair.publicKey(),
-          key: keyKeypair.publicKey()
+          key: keyKeypair.publicKey(),
+          nickname: b_nickname
         })}
       )
     ).toString('base64')
@@ -25,8 +28,7 @@ const create = async (event, context) => {
       statusCode: 200,
       headers,
       body: JSON.stringify({
-        master: masterKeypair.publicKey(),
-        app: appKeypair.publicKey(),
+        nickname: b_nickname,
         key: keyKeypair.publicKey(),
         token: encrypted
       })

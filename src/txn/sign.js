@@ -1,8 +1,7 @@
 import _ from 'lodash'
 import { server, headers, StellarSdk, parseError, getAuth, masterKeypair, getMasterUserKeypair } from '../js/utils'
-import { Pool } from '../js/pg'
+import Pool from '../js/pg'
 import sjcl from 'sjcl'
-import shajs from 'sha.js'
 
 export default async (event, context) => {
   try {

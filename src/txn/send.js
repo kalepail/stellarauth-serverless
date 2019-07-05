@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { headers, StellarSdk, parseError, getAuth } from '../js/utils'
-import { Pool } from '../js/pg'
+import Pool from '../js/pg'
+import pusher from '../js/pusher'
 
 export default async (event, context) => {
   try {
@@ -21,7 +22,9 @@ export default async (event, context) => {
       values ('${pgKey._master}', '${pgKey._app}', '${pgKey._user}', '${pgKey._key}', '${txn.hash().toString('hex')}', 'sent', '${b_xdr}')
     `)
 
-    if (pgKey)
+    if (pgKey) {
+      pusher.trigger(pgKey._user, 'txnSend', {})
+
       return {
         statusCode: 200,
         headers,
@@ -29,6 +32,7 @@ export default async (event, context) => {
           status: 200
         })
       }
+    }
 
     throw {
       status: 404

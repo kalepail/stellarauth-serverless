@@ -1,5 +1,5 @@
 import { headers, parseError, getAuth, getMasterUserKeypair } from '../js/utils'
-import { Pool } from '../js/pg'
+import Pool from '../js/pg'
 import _ from 'lodash'
 
 export default async (event, context) => {
@@ -24,9 +24,13 @@ export default async (event, context) => {
 
     const { masterUserPublic, userKeypair } = getMasterUserKeypair(h_auth)
 
-    await Pool.query(`
-      insert into keys (_master, _app, _user, upkey, _key, cipher)
-      values ('${data.master}', '${data.app}', '${userKeypair.publicKey()}', '${masterUserPublic}', '${data.key}', '${b_token}')
+    if (data.nickname) await Pool.query(`
+      insert into keys (_master, _app, _user, _key, nickname, mupub, cipher)
+      values ('${data.master}', '${data.app}', '${userKeypair.publicKey()}', '${data.key}', '${data.nickname}', '${masterUserPublic}', '${b_token}')
+    `)
+    else await Pool.query(`
+      insert into keys (_master, _app, _user, _key, mupub, cipher)
+      values ('${data.master}', '${data.app}', '${userKeypair.publicKey()}', '${data.key}', '${masterUserPublic}', '${b_token}')
     `)
 
     return {

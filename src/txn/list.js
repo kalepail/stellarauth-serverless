@@ -1,5 +1,5 @@
 import { headers, getAuth, parseError, StellarSdk } from '../js/utils'
-import { Pool } from '../js/pg'
+import Pool from '../js/pg'
 import _ from 'lodash'
 
 export default async (event, context) => {
