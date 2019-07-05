@@ -2,6 +2,7 @@ import _ from 'lodash'
 import { server, headers, StellarSdk, parseError, getAuth, masterKeypair, getMasterUserKeypair } from '../js/utils'
 import Pool from '../js/pg'
 import sjcl from 'sjcl'
+import pusher from '../js/pusher'
 
 export default async (event, context) => {
   try {
@@ -38,6 +39,8 @@ export default async (event, context) => {
       xdr='${txn.toXDR()}'
       where _txn='${b_txn}'
     `)
+
+    pusher.trigger(pgKey._user, 'txnSign', {})
 
     const result = await server
     .submitTransaction(txn)

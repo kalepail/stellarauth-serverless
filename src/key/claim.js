@@ -1,6 +1,7 @@
 import { headers, parseError, getAuth, getMasterUserKeypair } from '../js/utils'
-import Pool from '../js/pg'
 import _ from 'lodash'
+import Pool from '../js/pg'
+import pusher from '../js/pusher'
 
 export default async (event, context) => {
   try {
@@ -32,6 +33,8 @@ export default async (event, context) => {
       insert into keys (_master, _app, _user, _key, mupub, cipher)
       values ('${data.master}', '${data.app}', '${userKeypair.publicKey()}', '${data.key}', '${masterUserPublic}', '${b_token}')
     `)
+
+    pusher.trigger(userKeypair.publicKey(), 'keyClaim', {})
 
     return {
       statusCode: 200,
