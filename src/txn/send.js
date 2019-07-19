@@ -11,6 +11,23 @@ export default async (event, context) => {
     const txn = new StellarSdk.Transaction(b_xdr)
     const appKeypair = StellarSdk.Keypair.fromSecret(h_auth)
 
+    const setOptions = _.filter(txn.operations, {type: 'setOptions'})
+    
+    _.each(setOptions, (options) => {
+      if (
+        options.masterWeight !== undefined
+        || options.lowThreshold !== undefined
+        || options.medThreshold !== undefined
+        || options.highThreshold !== undefined
+      ) throw 'The setOptions[masterWeight,lowThreshold,medThreshold,highThreshold] operations are not supported'
+
+      if (options.setFlags >= 4)
+        throw 'Any setOptions.setFlags values must be less than 4'
+    })
+
+    if (_.map(txn.operations, 'type').indexOf('accountMerge') !== -1)
+      throw 'The accountMerge operation is not supported'
+
     const pgKey = await Pool.query(`
       select * from keys
       where _key='${txn.source}'
