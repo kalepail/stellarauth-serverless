@@ -114,6 +114,13 @@ functions:
           path: txn/sign
           method: POST
           cors: true
+  txnReject:
+    handler: handler.txn
+    events:
+      - http:
+          path: txn/reject
+          method: DELETE
+          cors: true
   txnList:
     handler: handler.txn
     events:

@@ -11,7 +11,6 @@ export default async (event, context) => {
     const pgKeys = await Pool.query(`
         select * from keys
         where _user='${userKeypair.publicKey()}'
-        -- and status='sent'
       `).then((data) => _
         .chain(data)
         .get('rows')

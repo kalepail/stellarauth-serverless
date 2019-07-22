@@ -3,6 +3,7 @@ import { headers } from './js/utils'
 import send from './txn/send'
 import sign from './txn/sign'
 import list from './txn/list'
+import reject from './txn/reject'
 
 const get = async (event, context) => {
   switch (event.path) {
@@ -35,6 +36,20 @@ const post = async (event, context) => {
   }
 }
 
+const _delete = async (event, context) => {
+  switch (event.path) {
+    case '/txn/reject':
+    return reject(event, context)
+
+    default:
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ message: 'Route not supported' })
+    }
+  }
+}
+
 export default (event, context, callback) => {
   context.callbackWaitsForEmptyEventLoop = false
 
@@ -44,6 +59,9 @@ export default (event, context, callback) => {
 
     case 'POST':
     return post(event, context)
+
+    case 'DELETE':
+    return _delete(event, context)
 
     default:
       callback(null, {
