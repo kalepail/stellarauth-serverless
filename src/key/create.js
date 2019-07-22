@@ -8,6 +8,9 @@ const create = async (event, context) => {
     const b_nickname = _.get(JSON.parse(event.body), 'nickname')
     const h_auth = getAuth(event)
 
+    if (/[^A-Z\ ]/gi.test(b_nickname))
+      throw 'Nickname contains invalid characters'
+
     const appKeypair = StellarSdk.Keypair.fromSecret(h_auth)
     const keyKeypair = StellarSdk.Keypair.random()
 
