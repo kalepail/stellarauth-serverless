@@ -2,6 +2,7 @@ import _ from 'lodash'
 import { headers, StellarSdk, parseError, getAuth } from '../js/utils'
 import Pool from '../js/pg'
 import pusher from '../js/pusher'
+import firebase from '../js/firebase'
 
 export default async (event, context) => {
   try {
@@ -34,13 +35,23 @@ export default async (event, context) => {
       and _app='${appKeypair.publicKey()}'
     `).then((data) => _.get(data, 'rows[0]'))
 
+    const hash = txn.hash().toString('hex')
+
     await Pool.query(`
       insert into txns (_master, _app, _user, _key, _txn, status, xdr)
-      values ('${pgKey._master}', '${pgKey._app}', '${pgKey._user}', '${pgKey._key}', '${txn.hash().toString('hex')}', 'sent', '${b_xdr}')
+      values ('${pgKey._master}', '${pgKey._app}', '${pgKey._user}', '${pgKey._key}', '${hash}', 'sent', '${b_xdr}')
     `)
 
     if (pgKey) {
       pusher.trigger(pgKey._user, 'txnSend', {})
+      firebase.messaging().send({
+        notification: {
+          title: pgKey.nickname,
+          body: hash
+        },
+        data: {},
+        topic: pgKey._user
+      })
 
       return {
         statusCode: 200,
