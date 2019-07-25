@@ -1,6 +1,8 @@
 import _ from 'lodash'
 import * as admin from 'firebase-admin'
-import serviceAccount from '../../certs/stellarauth-9578d-firebase-adminsdk-0xakw-23f88796bb.json'
+import { isDev } from './utils'
+
+const serviceAccount = require(`../../certs/stellarauth-9578d-firebase-adminsdk-0xakw-${isDev ? '23f88796bb' : 'effdd19406'}.json`)
 
 if (_.isEmpty(admin.apps))
   admin.initializeApp({
