@@ -9,7 +9,7 @@ export default async (event, context) => {
     const b_xdr = _.get(JSON.parse(event.body), 'xdr')
     const h_auth = getAuth(event)
 
-    const txn = new StellarSdk.Transaction(b_xdr)
+    let txn = new StellarSdk.Transaction(b_xdr)
     const appKeypair = StellarSdk.Keypair.fromSecret(h_auth)
 
     const setOptions = _.filter(txn.operations, {type: 'setOptions'})
@@ -43,15 +43,30 @@ export default async (event, context) => {
     `)
 
     if (pgKey) {
+      txn = Object.assign({}, {
+        memo: txn.memo._value ? txn.memo._value.toString() : '',
+        timeBounds: {}
+      }, txn)
+
       pusher.trigger(pgKey._user, 'txnSend', {})
-      firebase.messaging().send({
+
+      await firebase.messaging().send({
         notification: {
           title: pgKey.nickname,
-          body: hash
+          body: `${txn.memo} ${hash.substring(0, 5)}...${hash.substring(hash.length - 5)} ${txn.fee} ${txn.timeBounds.minTime} ${txn.timeBounds.maxTime}`.trim()
         },
         data: {},
+        android: {
+          priority: 'high'
+        },
+        apns: {
+          headers: {
+            'apns-priority': '10'
+          }
+        },
         topic: pgKey._user
       })
+      .catch((err) => console.error(err))
 
       return {
         statusCode: 200,
