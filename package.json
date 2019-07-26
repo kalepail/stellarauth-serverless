@@ -2,10 +2,10 @@
   "name": "stellarauth-serverless",
   "private": true,
   "scripts": {
-    "dev:test": "sls offline start --stage dev --subdomain api-testnet",
+    "dev:testnet": "sls offline start --stage dev --subdomain api-testnet",
     "dev:public": "sls offline start --stage prod --subdomain api",
-    "deploy:dev": "sls deploy --stage dev --subdomain api-testnet",
-    "deploy:prod": "sls deploy --stage prod --subdomain api"
+    "deploy:testnet": "sls deploy --stage dev --subdomain api-testnet",
+    "deploy:public": "sls deploy --stage prod --subdomain api"
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",
