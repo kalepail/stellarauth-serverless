@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { headers, StellarSdk, parseError, getAuth } from '../js/utils'
+import { headers, StellarSdk, parseError, getAuth, stellarNetwork } from '../js/utils'
 import Pool from '../js/pg'
 import pusher from '../js/pusher'
 import firebase from '../js/firebase'
@@ -9,7 +9,7 @@ export default async (event, context) => {
     const b_xdr = _.get(JSON.parse(event.body), 'xdr')
     const h_auth = getAuth(event)
 
-    let txn = new StellarSdk.Transaction(b_xdr)
+    let txn = new StellarSdk.Transaction(b_xdr, stellarNetwork)
     const appKeypair = StellarSdk.Keypair.fromSecret(h_auth)
 
     const setOptions = _.filter(txn.operations, {type: 'setOptions'})

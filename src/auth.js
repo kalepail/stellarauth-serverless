@@ -6,7 +6,7 @@ import bluebird from 'bluebird'
 import crypto from 'crypto'
 import shajs from 'sha.js'
 import { TransactionStellarUri } from '@stellarguard/stellar-uri'
-import { headers, isDev, isTestnet, server, source, StellarSdk } from './js/utils'
+import { headers, isTestnet, server, source, StellarSdk, stellarNetwork } from './js/utils'
 
 export default async (event, context) => {
   try {
@@ -91,7 +91,7 @@ export default async (event, context) => {
           if (rejected)
             return false
 
-          const envelope = new StellarSdk.Transaction(record.envelope_xdr)
+          const envelope = new StellarSdk.Transaction(record.envelope_xdr, stellarNetwork)
 
           _.each(envelope.operations, (operation) => {
             if (rejected)
@@ -150,7 +150,8 @@ export default async (event, context) => {
             memo: new StellarSdk.Memo(
               StellarSdk.MemoHash, 
               memo
-            )
+            ),
+            networkPassphrase: stellarNetwork
           }
         )
         .addOperation(StellarSdk.Operation.payment({
@@ -189,7 +190,7 @@ export default async (event, context) => {
       // uri.callback = 'https://stellarauth.com'
       // uri.pubkey = q_account
       uri.originDomain = 'stellarauth.com'
-      uri.networkPassphrase = StellarSdk.Networks[process.env.STELLAR_NETWORK]
+      uri.networkPassphrase = stellarNetwork
       uri.addSignature(source)
 
       return {

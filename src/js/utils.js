@@ -13,9 +13,7 @@ export const isTestnet = process.env.STELLAR_NETWORK === 'TESTNET'
 
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = isDev ? 0 : 1
 
-_StellarSdk.Network.use(
-  new _StellarSdk.Network(_StellarSdk.Networks[process.env.STELLAR_NETWORK])
-)
+export const stellarNetwork = _StellarSdk.Networks[process.env.STELLAR_NETWORK]
 
 export const server = new _StellarSdk.Server(process.env.HORIZON_URL)
 export const source = _StellarSdk.Keypair.fromSecret(process.env.AUTH_SECRET)

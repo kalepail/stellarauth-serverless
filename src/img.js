@@ -1,4 +1,4 @@
-import { headers, parseError, StellarSdk } from './js/utils'
+import { headers, parseError } from './js/utils'
 import qrcode from 'qrcode'
 import _ from 'lodash'
 import { StellarKeystore } from 'stellar-keystore'

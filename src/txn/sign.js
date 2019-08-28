@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { server, headers, StellarSdk, parseError, getAuth, masterKeypair, getMasterUserKeypair } from '../js/utils'
+import { server, headers, StellarSdk, parseError, getAuth, stellarNetwork, getMasterUserKeypair } from '../js/utils'
 import Pool from '../js/pg'
 import sjcl from 'sjcl'
 import pusher from '../js/pusher'
@@ -29,7 +29,7 @@ export default async (event, context) => {
       )
     )
 
-    const txn = new StellarSdk.Transaction(pgTxn.xdr)
+    const txn = new StellarSdk.Transaction(pgTxn.xdr, stellarNetwork)
         
     txn.sign(keyKeypair)
 
