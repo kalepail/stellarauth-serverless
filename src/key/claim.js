@@ -25,13 +25,27 @@ export default async (event, context) => {
 
     const { masterUserPublic, userKeypair } = getMasterUserKeypair(h_auth)
 
-    if (data.nickname) await Pool.query(`
-      insert into keys (_master, _app, _user, _key, nickname, mupub, cipher)
-      values ('${data.master}', '${data.app}', '${userKeypair.publicKey()}', '${data.key}', '${data.nickname}', '${masterUserPublic}', '${b_token}')
-    `)
-    else await Pool.query(`
-      insert into keys (_master, _app, _user, _key, mupub, cipher)
-      values ('${data.master}', '${data.app}', '${userKeypair.publicKey()}', '${data.key}', '${masterUserPublic}', '${b_token}')
+    let line1 = 'insert into keys (_master, _app, _user, _key, mupub, cipher'
+    let line2 = `values ('${data.master}', '${data.app}', '${userKeypair.publicKey()}', '${data.key}', '${masterUserPublic}', '${b_token}'`
+
+    if (data.name) {
+      line1 += ', name'
+      line2 += `, '${data.name}'`
+    }
+
+    if (data.image) {
+      line1 += ', image'
+      line2 += `, '${data.image}'`
+    }
+
+    if (data.link) {
+      line1 += ', link'
+      line2 += `, '${data.link}'`
+    }
+    
+    await Pool.query(`
+      ${line1})
+      ${line2})
     `)
 
     pusher.trigger(userKeypair.publicKey(), 'keyClaim', {})

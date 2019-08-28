@@ -16,7 +16,9 @@ export default async (event, context) => {
         .get('rows')
         .map((key) => ({
           _key: key._key,
-          nickname: key.nickname,
+          name: key.name,
+          image: key.image,
+          link: key.link,
           verified: !key.mupub
         }))
         .value()
