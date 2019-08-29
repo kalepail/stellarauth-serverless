@@ -11,13 +11,14 @@ export default async (event, context) => {
     const pgTxns = await Pool.query(`
         select * from txns
         where _user='${userKeypair.publicKey()}'
-        and status!='rejected'
+        -- and status!='rejected'
       `).then((data) => _
         .chain(data)
         .get('rows')
         .map((txn) => ({
           _txn: txn._txn,
           _key: txn._key,
+          timestamp: txn.timestamp,
           status: txn.status,
           xdr: txn.xdr
         }))
