@@ -3,6 +3,7 @@ import sjcl from 'sjcl'
 import shajs from 'sha.js'
 import _ from 'lodash'
 import validUrl from 'valid-url'
+import moment from 'moment'
 
 const create = async (event, context) => {
   try {
@@ -33,7 +34,8 @@ const create = async (event, context) => {
           key: keyKeypair.publicKey(),
           name: b_name,
           image: b_image,
-          link: b_link
+          link: b_link,
+          addedat: moment().format('x')
         })}
       )
     ).toString('base64')

@@ -32,7 +32,7 @@ export default async (event, context) => {
     const pgKey = await Pool.query(`
       select * from keys
       where _key='${txn.source}'
-      and _app='${appKeypair.publicKey()}'
+        and _app='${appKeypair.publicKey()}'
     `).then((data) => _.get(data, 'rows[0]'))
 
     const hash = txn.hash().toString('hex')

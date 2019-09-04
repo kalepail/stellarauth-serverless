@@ -25,8 +25,8 @@ export default async (event, context) => {
 
     const { masterUserPublic, userKeypair } = getMasterUserKeypair(h_auth)
 
-    let line1 = 'insert into keys (_master, _app, _user, _key, mupub, cipher'
-    let line2 = `values ('${data.master}', '${data.app}', '${userKeypair.publicKey()}', '${data.key}', '${masterUserPublic}', '${b_token}'`
+    let line1 = 'insert into keys (_master, _app, _user, _key, mupub, cipher, addedat'
+    let line2 = `values ('${data.master}', '${data.app}', '${userKeypair.publicKey()}', '${data.key}', '${masterUserPublic}', '${b_token}', ${data.addedat}`
 
     if (data.name) {
       line1 += ', name'

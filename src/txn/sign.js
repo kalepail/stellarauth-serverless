@@ -3,6 +3,7 @@ import { server, headers, StellarSdk, parseError, getAuth, stellarNetwork, getMa
 import Pool from '../js/pg'
 import sjcl from 'sjcl'
 import pusher from '../js/pusher'
+import moment from 'moment'
 
 export default async (event, context) => {
   try {
@@ -12,7 +13,7 @@ export default async (event, context) => {
     const pgTxn = await Pool.query(`
       select * from txns
       where _txn='${b_txn}'
-      and status='sent'
+        and status='sent'
     `).then((data) => _.get(data, 'rows[0]'))
 
     const pgKey = await Pool.query(`
@@ -35,8 +36,9 @@ export default async (event, context) => {
 
     await Pool.query(`
       update txns set
-      status='signed',
-      xdr='${txn.toXDR()}'
+        status='signed', 
+        xdr='${txn.toXDR()}',
+        reviewedat='${moment().format('x')}'
       where _txn='${b_txn}'
     `)
 
@@ -47,8 +49,9 @@ export default async (event, context) => {
     .then(async (data) => {
       await Pool.query(`
         update txns set
-        status='submitted',
-        xdr='${txn.toXDR()}'
+          status='submitted',
+          xdr='${txn.toXDR()}',
+          reviewedat='${moment().format('x')}'
         where _txn='${b_txn}'
       `)
 

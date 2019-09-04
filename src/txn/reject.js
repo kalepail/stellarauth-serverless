@@ -2,6 +2,7 @@ import _ from 'lodash'
 import { headers, StellarSdk, parseError, getAuth } from '../js/utils'
 import Pool from '../js/pg'
 import pusher from '../js/pusher'
+import moment from 'moment'
 
 export default async (event, context) => {
   try {
@@ -11,7 +12,7 @@ export default async (event, context) => {
     const pgTxn = await Pool.query(`
       select * from txns
       where _txn='${b_txn}'
-      and status='sent'
+        and status='sent'
     `).then((data) => _.get(data, 'rows[0]'))
 
     if (!pgTxn)
@@ -21,9 +22,10 @@ export default async (event, context) => {
 
     await Pool.query(`
       update txns set
-      status='rejected'
+        status='rejected', 
+        reviewedat='${moment().format('x')}'
       where _txn='${b_txn}'
-      and _user='${pgTxn._user}'
+        and _user='${pgTxn._user}'
     `)
 
     pusher.trigger(pgTxn._user, 'txnReject', {})

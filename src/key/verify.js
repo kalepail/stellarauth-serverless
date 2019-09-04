@@ -38,11 +38,11 @@ export default async (event, context) => {
 
     await Pool.query(`
       update keys set
-      cipher='${encrypted}',
-      mupub=NULL
+        cipher='${encrypted}',
+        mupub=NULL
       where _key='${keyKeypair.publicKey()}'
-      and _user='${pgKey._user}'
-      and _app='${appKeypair.publicKey()}'
+        and _user='${pgKey._user}'
+        and _app='${appKeypair.publicKey()}'
     `)
 
     pusher.trigger(pgKey._user, 'keyVerify', {})

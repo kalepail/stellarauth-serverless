@@ -41,10 +41,10 @@ export default async (event, context) => {
 
     await Pool.query(`
       update keys set
-      ${query.substring(1)}
+        ${query.substring(1)}
       where _key='${b_key}'
-      and _user='${pgKey._user}'
-      and _app='${appKeypair.publicKey()}'
+        and _user='${pgKey._user}'
+        and _app='${appKeypair.publicKey()}'
     `)
 
     pusher.trigger(pgKey._user, 'keyUpdate', {})

@@ -19,6 +19,7 @@ export default async (event, context) => {
           name: key.name,
           image: key.image,
           link: key.link,
+          addedat: key.addedat,
           verified: !key.mupub
         }))
         .value()
