@@ -53,7 +53,7 @@ export default async (event, context) => {
       await firebase.messaging().send({
         notification: {
           title: pgKey.name,
-          body: `${txn.memo} ${hash.substring(0, 5)}...${hash.substring(hash.length - 5)} ${txn.fee} ${txn.timeBounds.minTime} ${txn.timeBounds.maxTime}`.trim()
+          body: `${txn.memo} ${hash.substring(0, 5)}...${hash.substring(hash.length - 5)}`.trim()
         },
         data: {},
         android: {
