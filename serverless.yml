@@ -16,7 +16,7 @@ custom:
   #   createRoute53Record: false
   apigwBinary:
     types:
-      - 'image/*'
+      - '*/*'
   webpack:
     webpackConfig: ./webpack.config.js
     includeModules: true
