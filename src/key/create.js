@@ -12,7 +12,7 @@ const create = async (event, context) => {
     const b_image = _.get(JSON.parse(event.body), 'image')
     const b_link = _.get(JSON.parse(event.body), 'link')
 
-    if (!b_name || /[^A-Z\ ]/gi.test(b_name))
+    if (!b_name || /[^A-Z0-9\ ]/gi.test(b_name))
       throw 'Name contains invalid characters'
 
     if (b_image && !validUrl.isWebUri(b_image))
