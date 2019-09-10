@@ -4,19 +4,23 @@ import _ from 'lodash'
 
 export default async (event, context) => {
   try {
+    let pgTxns
+    
     const h_auth = getAuth(event)
+    const q_key = _.get(event.queryStringParameters, 'key')
 
-    const userKeypair = StellarSdk.Keypair.fromSecret(h_auth)
+    const someKeypair = StellarSdk.Keypair.fromSecret(h_auth)
 
-    const pgTxns = await Pool.query(`
+    if (q_key) {
+      pgTxns = await Pool.query(`
         select * from txns
-        where _user='${userKeypair.publicKey()}'
+        where _app='${someKeypair.publicKey()}'
+          and _key='${q_key}'
       `).then((data) => _
         .chain(data)
         .get('rows')
         .map((txn) => ({
           _txn: txn._txn,
-          _key: txn._key,
           requestedat: txn.requestedat,
           reviewedat: txn.reviewedat,
           status: txn.status,
@@ -24,6 +28,24 @@ export default async (event, context) => {
         }))
         .value()
       )
+    }
+
+    else pgTxns = await Pool.query(`
+      select * from txns
+      where _user='${someKeypair.publicKey()}'
+    `).then((data) => _
+      .chain(data)
+      .get('rows')
+      .map((txn) => ({
+        _txn: txn._txn,
+        _key: txn._key,
+        requestedat: txn.requestedat,
+        reviewedat: txn.reviewedat,
+        status: txn.status,
+        xdr: txn.xdr
+      }))
+      .value()
+    )
 
     return {
       statusCode: 200,
