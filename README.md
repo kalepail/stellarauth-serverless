@@ -1,57 +1,22 @@
-# StellarAuth API
+![](https://cl.ly/04bc5d0530cd/Branding.png)
+# StellarAuth
 
-## Access Urls
-- **Pubnet:** https://api.stellarauth.com/auth
-- **Testnet:** https://api-testnet.stellarauth.com/auth
+## Summary
+StellarAuth is a developer API and user application service for **easily and securely assigning Stellar accounts to your users from within your app.** Kind of like **Authy (2FA) for Stellar**, but also a lot like a combination of **Sign In with Apple and Apple Card**. Essentially it’s a secure way to give your users a Stellar account which you can send requests to and they can accept or decline in an intuitive interface. You won’t store secrets, we don’t have access to secrets and the user won’t have to deal with anything they're not already familiar with.
 
-## Get Auth Transaction XDR
-**GET** https://api-testnet.stellarauth.com/auth
-- `ttl=3600`
-- `account=GC44PZG3GOPLEJK2XD4CD5EMPBDGGD4PEYDRDJYTJO7X2KBJRXGTYLER`
-```json
-RESPONSE = {
-    "account": "GC44PZG3GOPLEJK2XD4CD5EMPBDGGD4PEYDRDJYTJO7X2KBJRXGTYLER",
-    "transaction": "AAAAALnH5NsznrIlWrj4IfSMeEZjD48mBxGnE0u/fSgpjc08AAAAZAADvRIAAABOAAAAAQAAAABc/ozsAAAAAFz+mvwAAAADImGQosv7ohIEynqOZ33gBZpSWhRprvLVvVG3QeqyEooAAAABAAAAAQAAAADc4DaSVJ2Uqh+ZsvHMl3xWWV+lkfWk41JRJDfaJjR88AAAAAEAAAAAucfk2zOesiVauPgh9Ix4RmMPjyYHEacTS799KCmNzTwAAAAAAAAAAAAAAGQAAAAAAAAAASY0fPAAAABAEMmxuvp3z8q0H3Fsiz1do+bjNzOzKVdCX9jHG8sdh55SWACaDkQ1PHEapbqhWQyyG32YnjULKEirHRRmgGe0Ag==",
-    "auth": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NjAxOTMyOTIsImhhc2giOiIyNDQ1NzgzZWM4YTdlMmMzMjJkMzczMmQ5OWUzYjMwNGVmYmUyZjRlMDFkYWE1MmQzNzQ0N2FiZjc3NzhlNmVmIiwidG9rZW4iOiI3MWUxZDNhNDlhYWIzMDg5Y2Q3Mzk4MWExNzMyYzY3ODJhZGFiZWVmMDgxY2JkZGNjZjcyMWVhZTk4ZTY0OGE1MDQzNTA4ZGI4NzUyNGRhMmUyNjdkM2MwOTQzYWRiODU4OWY0MGE3MTUwMzE5ZmE5OTlhMDYxMDhlYTgwZjQzNCIsImlhdCI6MTU2MDE4NjA5N30.XcaGPX9rgS-LNLbNqP_qHDwZFqUolBl0bQuAHcNt9og"
-}
-```
+## Links
+- **Galactic Talk:** [https://galactictalk.org/d/2137-stellarauth-easily-and-securely-manage-lots-of-stellar-accounts](https://galactictalk.org/d/2137-stellarauth-easily-and-securely-manage-lots-of-stellar-accounts)
 
-## Verify Auth Transaction Hash
-**GET** https://api-testnet.stellarauth.com/auth  
-**HEADER** ``Authorization: `Bearer ${RESPONSE.auth}``
+- **API Docs:** https://www.notion.so/stellarauth/StellarAuth-085c9270636b4196979dc49cf296cf03
+- **API Code:** https://github.com/TinyAnvil/stellarauth-serverless/tree/full
 
-```json
-// 404 Not yet verifed
-{
-  "type": "https://stellar.org/horizon-errors/not_found",
-  "title": "Resource Missing",
-  "status": 404,
-  "detail": "The resource at the url requested was not found.  This is usually occurs for one of two reasons:  The url requested is not valid, or no data in our database could be found with the parameters provided.",
-  "resource": "transaction"
-}
-```
-
-```json
-// 401 Token or transaction expired
-{
-  "message": "Login transaction has expired"
-}
-```
-
-```json
-// 200 Transaction valid and verified
-{
-  "memo": "ImGQosv7ohIEynqOZ33gBZpSWhRprvLVvVG3QeqyEoo=",
-  "successful": true,
-  "hash": "2445783ec8a7e2c322d3732d99e3b304efbe2f4e01daa52d37447abf7778e6ef",
-  "ledger": 763970,
-  "created_at": "2019-06-10T17:02:07Z",
-  "source_account": "GC44PZG3GOPLEJK2XD4CD5EMPBDGGD4PEYDRDJYTJO7X2KBJRXGTYLER",
-  "signatures": [
-      "EMmxuvp3z8q0H3Fsiz1do+bjNzOzKVdCX9jHG8sdh55SWACaDkQ1PHEapbqhWQyyG32YnjULKEirHRRmgGe0Ag==",
-      "2M0j7v3QBGcGpIVDX6BMkzGovBxmJVJeo2XbC75N9boR181G/FiFNUeOXFpxBE30XhYMRc05AGLb7g/VFqgaAw=="
-  ],
-  "valid_after": "2019-06-10T17:01:32Z",
-  "valid_before": "2019-06-10T18:01:32Z"
-}
-```
+- **Data Faker Service:** [https://stellarauth-faker.glitch.me](https://stellarauth-faker.glitch.me/)
+    - Generates a demo app key which once scanned will automatically verify and send 5 example transactions arriving over the course of five minutes
+    
+- **Web App:** [https://stellarauth.now.sh](https://stellarauth.now.sh/) (For testing only, will not support the public network)
+- **Desktop Apps:**
+    - **Windows**: [https://cl.ly/4dc15dcb7294](https://cl.ly/4dc15dcb7294)
+    - **Mac**: [https://cl.ly/6c7eec2d6757](https://cl.ly/6c7eec2d6757)
+- **Mobile Apps:**
+    - **Android:** Coming soon
+    - **iOS:** [https://testflight.apple.com/join/Slcgw56c](https://testflight.apple.com/join/Slcgw56c)
