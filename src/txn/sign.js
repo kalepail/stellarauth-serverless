@@ -24,6 +24,9 @@ export default async (event, context) => {
       where _key='${pgTxn._key}'
     `).then((data) => _.get(data, 'rows[0]'))
 
+    if (!StellarSdk.Utils.verifyTxSignedBy(txn, pgKey._user))
+      throw `Transaction missing ${pgKey._user.substring(0, 5)}…${pgKey._user.substring(pgKey._user.length - 5)} signature`
+
     await Pool.query(`
       update txns set
         status='signed', 
