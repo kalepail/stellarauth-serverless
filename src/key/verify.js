@@ -41,7 +41,7 @@ export default async (event, context) => {
       update keys set
         pubkey=NULL,
         cipher='${encrypted}',
-        claimedat='${moment().format('x')}'
+        verifiedat='${moment().format('x')}'
       where _key='${keyKeypair.publicKey()}'
     `)
 
