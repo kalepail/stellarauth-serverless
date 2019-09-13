@@ -1,18 +1,21 @@
 import _ from 'lodash'
-import { server, headers, StellarSdk, parseError, getAuth, stellarNetwork, getMasterUserKeypair } from '../js/utils'
+import { server, headers, StellarSdk, parseError, stellarNetwork } from '../js/utils'
 import Pool from '../js/pg'
-import sjcl from 'sjcl'
 import pusher from '../js/pusher'
 import moment from 'moment'
 
+// TODO: ensure the xdr has the signature we're expecting (could look at the txn in the db and ensure the _user publickey is in the signer list)
+
 export default async (event, context) => {
   try {
-    const b_txn = _.get(JSON.parse(event.body), 'txn')
-    const h_auth = getAuth(event)
+    const b_xdr = _.get(JSON.parse(event.body), 'xdr')
+
+    const txn = new StellarSdk.Transaction(b_xdr, stellarNetwork)
+    const hash = txn.hash().toString('hex')
 
     const pgTxn = await Pool.query(`
       select * from txns
-      where _txn='${b_txn}'
+      where _txn='${hash}'
         and status='sent'
     `).then((data) => _.get(data, 'rows[0]'))
 
@@ -21,25 +24,12 @@ export default async (event, context) => {
       where _key='${pgTxn._key}'
     `).then((data) => _.get(data, 'rows[0]'))
 
-    const { masterUserKeypair } = getMasterUserKeypair(h_auth)
-
-    const keyKeypair = StellarSdk.Keypair.fromSecret(
-      sjcl.decrypt(
-        masterUserKeypair.sec,
-        Buffer.from(pgKey.cipher, 'base64').toString()
-      )
-    )
-
-    const txn = new StellarSdk.Transaction(pgTxn.xdr, stellarNetwork)
-        
-    txn.sign(keyKeypair)
-
     await Pool.query(`
       update txns set
         status='signed', 
-        xdr='${txn.toXDR()}',
+        xdr='${b_xdr}',
         reviewedat='${moment().format('x')}'
-      where _txn='${b_txn}'
+      where _txn='${hash}'
     `)
 
     pusher.trigger(pgKey._user, 'txnSign', {})
@@ -50,7 +40,6 @@ export default async (event, context) => {
       await Pool.query(`
         update txns set
           status='submitted',
-          xdr='${txn.toXDR()}',
           reviewedat='${moment().format('x')}'
         where _txn='${b_txn}'
       `)

@@ -4,14 +4,10 @@ import create from './key/create'
 import update from './key/update'
 import claim from './key/claim'
 import verify from './key/verify'
-import check from './key/check'
 import list from './key/list'
 
 const get = async (event, context) => {
   switch (event.path) {
-    case '/key/check':
-    return check(event, context)
-
     case '/key/list':
     return list(event, context)
 

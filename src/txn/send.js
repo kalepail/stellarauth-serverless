@@ -9,8 +9,9 @@ export default async (event, context) => {
     const b_xdr = _.get(JSON.parse(event.body), 'xdr')
     const h_auth = getAuth(event)
 
+    StellarSdk.Keypair.fromSecret(h_auth)
+
     let txn = new StellarSdk.Transaction(b_xdr, stellarNetwork)
-    const appKeypair = StellarSdk.Keypair.fromSecret(h_auth)
 
     const setOptions = _.filter(txn.operations, {type: 'setOptions'})
     
@@ -32,7 +33,6 @@ export default async (event, context) => {
     const pgKey = await Pool.query(`
       select * from keys
       where _key='${txn.source}'
-        and _app='${appKeypair.publicKey()}'
     `).then((data) => _.get(data, 'rows[0]'))
 
     const hash = txn.hash().toString('hex')

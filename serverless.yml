@@ -35,30 +35,6 @@ provider:
   environment: ${file(env.yml):${opt:stage}}
 
 functions:
-  # auth:
-  #   handler: handler.auth
-  #   events:
-  #     - http:
-  #         path: auth
-  #         method: get
-  #         cors: true
-
-  appCreate:
-    handler: handler.app
-    events:
-      - http:
-          path: app
-          method: POST
-          cors: true
-
-  userCreate:
-    handler: handler.user
-    events:
-      - http:
-          path: user
-          method: POST
-          cors: true
-  
   keyCreate:
     handler: handler.key
     events:
@@ -86,13 +62,6 @@ functions:
       - http:
           path: key/verify
           method: POST
-          cors: true
-  keyCheck:
-    handler: handler.key
-    events:
-      - http:
-          path: key/check
-          method: GET
           cors: true
   keyList:
     handler: handler.key

@@ -15,17 +15,10 @@ export default async (event, context) => {
       Buffer.from(p_token, 'base64').toString()
     )
 
-    if (decoded.adata) {
-      const data = JSON.parse(
-        Buffer.from(decoded.adata, 'base64').toString()
-      )
-
-      if (!(data.master && data.app && data.key))
-        throw 'Invalid token'
-    }
-
-    else if (!await stellarKeystore.publicKey(decoded))
-      throw 'Invalid token'
+    if (
+      typeof decoded.adata !== 'string'
+      && !await stellarKeystore.publicKey(decoded)
+    ) throw 'Invalid token'
   
     let qr = await qrcode.toDataURL(p_token)
         qr = qr.replace(/^data:image\/png;base64,/, '')

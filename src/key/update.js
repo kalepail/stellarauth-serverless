@@ -12,6 +12,8 @@ export default async (event, context) => {
     const b_image = _.get(JSON.parse(event.body), 'image')
     const b_link = _.get(JSON.parse(event.body), 'link')
 
+    StellarSdk.Keypair.fromSecret(h_auth)
+
     if (b_name && /[^A-Z\ ]/gi.test(b_name))
       throw 'Name contains invalid characters'
 
@@ -20,8 +22,6 @@ export default async (event, context) => {
 
     if (b_link && !validUrl.isWebUri(b_link))
       throw 'Link contains invalid characters'
-
-    const appKeypair = StellarSdk.Keypair.fromSecret(h_auth)
 
     const pgKey = await Pool.query(`
       select * from keys
@@ -43,8 +43,6 @@ export default async (event, context) => {
       update keys set
         ${query.substring(1)}
       where _key='${b_key}'
-        and _user='${pgKey._user}'
-        and _app='${appKeypair.publicKey()}'
     `)
 
     pusher.trigger(pgKey._user, 'keyUpdate', {})

@@ -1,4 +1,4 @@
-import { headers, parseError, getAuth, getMasterUserKeypair } from '../js/utils'
+import { headers, parseError, getAuth } from '../js/utils'
 import _ from 'lodash'
 import Pool from '../js/pg'
 import pusher from '../js/pusher'
@@ -6,7 +6,8 @@ import pusher from '../js/pusher'
 export default async (event, context) => {
   try {
     const b_token = _.get(JSON.parse(event.body), 'token')
-    const h_auth = getAuth(event)
+    const b_user = _.get(JSON.parse(event.body), 'user')
+    const b_pubkey = _.get(JSON.parse(event.body), 'pubkey')
 
     const data = JSON.parse(
       Buffer.from(
@@ -23,10 +24,8 @@ export default async (event, context) => {
       ).toString()
     )
 
-    const { masterUserPublic, userKeypair } = getMasterUserKeypair(h_auth)
-
-    let line1 = 'insert into keys (_master, _app, _user, _key, mupub, cipher, addedat'
-    let line2 = `values ('${data.master}', '${data.app}', '${userKeypair.publicKey()}', '${data.key}', '${masterUserPublic}', '${b_token}', ${data.addedat}`
+    let line1 = 'insert into keys (_master, _app, _user, _key, pubkey, cipher'
+    let line2 = `values ('${data.master}', '${data.app}', '${b_user}', '${data.key}', '${b_pubkey}', '${b_token}'`
 
     if (data.name) {
       line1 += ', name'
@@ -48,7 +47,7 @@ export default async (event, context) => {
       ${line2})
     `)
 
-    pusher.trigger(userKeypair.publicKey(), 'keyClaim', {})
+    pusher.trigger(b_user, 'keyClaim', {})
 
     return {
       statusCode: 200,
