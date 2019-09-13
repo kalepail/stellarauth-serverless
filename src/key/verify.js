@@ -16,6 +16,7 @@ export default async (event, context) => {
     const pgKey = await Pool.query(`
       select * from keys
       where _key='${b_key}'
+        and _app='${appKeypair.publicKey()}'
     `).then((data) => _.get(data, 'rows[0]'))
 
     const keyKeypair = StellarSdk.Keypair.fromSecret(
@@ -43,6 +44,7 @@ export default async (event, context) => {
         cipher='${encrypted}',
         verifiedat='${moment().format('x')}'
       where _key='${keyKeypair.publicKey()}'
+        and _app='${appKeypair.publicKey()}'
     `)
 
     pusher.trigger(pgKey._user, 'keyVerify', {})

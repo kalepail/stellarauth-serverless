@@ -32,21 +32,6 @@ export function getAuth(event) {
   return h_auth
 }
 
-export function getMasterUserKeypair(h_auth) {
-  const userKeypair = StellarSdk.Keypair.fromSecret(h_auth)
-  const masterUserSecret = sjcl.codec.base64.toBits(shajs('sha256').update(masterKeypair.secret() + userKeypair.secret()).digest('base64'))
-  const masterUserKeypair = sjcl.ecc.elGamal.generateKeys(256, 6, masterUserSecret)
-
-  let masterUserPublic = masterUserKeypair.pub.get()
-      masterUserPublic = sjcl.codec.base64.fromBits(masterUserPublic.x.concat(masterUserPublic.y))
-
-  return {
-    userKeypair,
-    masterUserKeypair,
-    masterUserPublic
-  }
-}
-
 export function parseError(err) {
   const error = 
   typeof err === 'string' 

@@ -1,14 +1,22 @@
-import { headers, parseError } from '../js/utils'
+import { headers, parseError, getAuth, stellarNetwork, StellarSdk } from '../js/utils'
 import Pool from '../js/pg'
 import _ from 'lodash'
-
-// TODO:
-// This call should limited to users only, don't want to allow apps to list out all a user's keys
-// Apps might should be able to list out all the keys they've created though. However that would likely need to be paginated
+import moment from 'moment'
 
 export default async (event, context) => {
   try {
+    const h_auth = getAuth(event)
     const q_user = _.get(event.queryStringParameters, 'user')
+
+    const txn = new StellarSdk.Transaction(h_auth, stellarNetwork) 
+
+    if (moment(txn.timeBounds.maxTime, 'X').isBefore()) throw {
+      status: 401,
+      message: 'Authorization header token has expired'
+    }
+
+    if (!StellarSdk.Utils.verifyTxSignedBy(txn, q_user))
+      throw `Authorization header missing ${q_user.substring(0, 5)}…${q_user.substring(q_user.length - 5)} signature`
 
     const pgKeys = await Pool.query(`
       select * from keys

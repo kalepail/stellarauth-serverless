@@ -1,4 +1,4 @@
-import { headers, parseError, getAuth } from '../js/utils'
+import { headers, parseError } from '../js/utils'
 import _ from 'lodash'
 import Pool from '../js/pg'
 import pusher from '../js/pusher'
