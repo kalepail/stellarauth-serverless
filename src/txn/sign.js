@@ -4,8 +4,6 @@ import Pool from '../js/pg'
 import pusher from '../js/pusher'
 import moment from 'moment'
 
-// TODO: ensure the xdr has the signature we're expecting (could look at the txn in the db and ensure the _user publickey is in the signer list)
-
 export default async (event, context) => {
   try {
     const b_xdr = _.get(JSON.parse(event.body), 'xdr')
@@ -19,13 +17,13 @@ export default async (event, context) => {
         and status='sent'
     `).then((data) => _.get(data, 'rows[0]'))
 
+    if (!StellarSdk.Utils.verifyTxSignedBy(txn, pgTxn._key))
+      throw `Transaction missing ${pgTxn._key.substring(0, 5)}…${pgTxn._key.substring(pgTxn._key.length - 5)} signature`
+
     const pgKey = await Pool.query(`
       select * from keys
       where _key='${pgTxn._key}'
     `).then((data) => _.get(data, 'rows[0]'))
-
-    if (!StellarSdk.Utils.verifyTxSignedBy(txn, pgKey._user))
-      throw `Transaction missing ${pgKey._user.substring(0, 5)}…${pgKey._user.substring(pgKey._user.length - 5)} signature`
 
     await Pool.query(`
       update txns set
