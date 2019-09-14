@@ -14,9 +14,9 @@ export default async (event, context) => {
 
     const pgKey = await Pool.query(`
       select * from keys
-      where passkey='${b_passkey}'
+      where _app='${appKeypair.publicKey()}'
+        and passkey='${b_passkey}'
         or _key='${b_key}'
-        and _app='${appKeypair.publicKey()}'
     `).then((data) => _.get(data, 'rows[0]'))
 
     await Pool.query(`
@@ -24,7 +24,7 @@ export default async (event, context) => {
         verifiedat='${moment().format('x')}'
       where _key='${pgKey._key}'
         and _app='${appKeypair.publicKey()}'
-        and verifiedat=NULL
+        and verifiedat IS NULL
     `)
 
     pusher.trigger(pgKey._user, 'keyVerify', {})
