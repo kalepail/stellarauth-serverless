@@ -1,7 +1,5 @@
 import * as _StellarSdk from 'stellar-sdk'
 import _ from 'lodash'
-import sjcl from 'sjcl'
-import shajs from 'sha.js'
 
 export const isDev = process.env.NODE_ENV !== 'production'
 export const isTestnet = process.env.STELLAR_NETWORK === 'TESTNET'

@@ -42,7 +42,7 @@ export default async (event, context) => {
         update txns set
           status='submitted',
           reviewedat='${moment().format('x')}'
-        where _txn='${b_txn}'
+        where _txn='${hash}'
       `)
 
       return data

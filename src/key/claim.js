@@ -1,13 +1,24 @@
-import { headers, parseError } from '../js/utils'
+import { headers, parseError, getAuth, StellarSdk, stellarNetwork } from '../js/utils'
 import _ from 'lodash'
 import Pool from '../js/pg'
 import pusher from '../js/pusher'
+import moment from 'moment'
 
 export default async (event, context) => {
   try {
+    const h_auth = getAuth(event)
     const b_token = _.get(JSON.parse(event.body), 'token')
-    const b_user = _.get(JSON.parse(event.body), 'user')
     const b_pubkey = _.get(JSON.parse(event.body), 'pubkey')
+
+    const txn = new StellarSdk.Transaction(h_auth, stellarNetwork)
+
+    if (moment(txn.timeBounds.maxTime, 'X').isBefore()) throw {
+      status: 401,
+      message: 'Authorization header token has expired'
+    }
+
+    if (!StellarSdk.Utils.verifyTxSignedBy(txn, txn.source))
+      throw `Authorization header missing ${txn.source.substring(0, 5)}…${txn.source.substring(txn.source.length - 5)} signature`
 
     const data = JSON.parse(
       Buffer.from(
@@ -25,7 +36,7 @@ export default async (event, context) => {
     )
 
     let line1 = 'insert into keys (_master, _app, _user, _key, pubkey, cipher'
-    let line2 = `values ('${data.master}', '${data.app}', '${b_user}', '${data.key}', '${b_pubkey}', '${b_token}'`
+    let line2 = `values ('${data.master}', '${data.app}', '${txn.source}', '${data.key}', '${b_pubkey}', '${b_token}'`
 
     if (data.name) {
       line1 += ', name'
@@ -47,7 +58,7 @@ export default async (event, context) => {
       ${line2})
     `)
 
-    pusher.trigger(b_user, 'keyClaim', {})
+    pusher.trigger(txn.source, 'keyClaim', {})
 
     return {
       statusCode: 200,

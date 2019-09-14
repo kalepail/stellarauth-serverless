@@ -6,7 +6,6 @@ import moment from 'moment'
 export default async (event, context) => {
   try {
     const h_auth = getAuth(event)
-    const q_user = _.get(event.queryStringParameters, 'user')
 
     const txn = new StellarSdk.Transaction(h_auth, stellarNetwork) 
 
@@ -15,12 +14,12 @@ export default async (event, context) => {
       message: 'Authorization header token has expired'
     }
 
-    if (!StellarSdk.Utils.verifyTxSignedBy(txn, q_user))
-      throw `Authorization header missing ${q_user.substring(0, 5)}…${q_user.substring(q_user.length - 5)} signature`
+    if (!StellarSdk.Utils.verifyTxSignedBy(txn, txn.source))
+      throw `Authorization header missing ${txn.source.substring(0, 5)}…${txn.source.substring(txn.source.length - 5)} signature`
 
     const pgKeys = await Pool.query(`
       select * from keys
-      where _user='${q_user}'
+      where _user='${txn.source}'
     `).then((data) => _
       .chain(data)
       .get('rows')
