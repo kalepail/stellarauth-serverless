@@ -1,8 +1,9 @@
-import { headers, StellarSdk, parseError, masterKeypair, getAuth } from '../js/utils'
+import { headers, StellarSdk, parseError, getAuth } from '../js/utils'
 import sjcl from 'sjcl'
 import shajs from 'sha.js'
 import _ from 'lodash'
 import validUrl from 'valid-url'
+import crypto from 'crypto'
 
 const create = async (event, context) => {
   try {
@@ -21,29 +22,22 @@ const create = async (event, context) => {
       throw 'Link contains invalid characters'
 
     const appKeypair = StellarSdk.Keypair.fromSecret(h_auth)
-    const keyKeypair = StellarSdk.Keypair.random()
+    const passkey = crypto.randomBytes(16).toString('hex')
 
-    const encrypted = Buffer.from(
-      sjcl.encrypt(
-        shajs('sha256').update(masterKeypair.secret() + appKeypair.secret()).digest('hex'),
-        keyKeypair.secret(),
-        {adata: JSON.stringify({
-          master: masterKeypair.publicKey(),
-          app: appKeypair.publicKey(),
-          key: keyKeypair.publicKey(),
-          name: b_name,
-          image: b_image,
-          link: b_link
-        })}
-      )
-    ).toString('base64')
+    const cipher = Buffer.from(JSON.stringify({
+      passkey,
+      app: appKeypair.publicKey(),
+      name: b_name,
+      image: b_image,
+      link: b_link
+    })).toString('base64')
 
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
-        key: keyKeypair.publicKey(),
-        token: encrypted
+        passkey, 
+        cipher
       })
     }
   }

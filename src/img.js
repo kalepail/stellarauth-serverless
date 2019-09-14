@@ -1,26 +1,21 @@
 import { headers, parseError } from './js/utils'
 import qrcode from 'qrcode'
 import _ from 'lodash'
-import { StellarKeystore } from 'stellar-keystore'
-
-const stellarKeystore = new StellarKeystore()
 
 export default async (event, context) => {
   try {
     context.callbackWaitsForEmptyEventLoop = false
 
-    const p_token = decodeURIComponent(_.get(event, 'pathParameters.token'))
+    const q_cipher = _.get(event.queryStringParameters, 'cipher')
 
     const decoded = JSON.parse(
-      Buffer.from(p_token, 'base64').toString()
+      Buffer.from(q_cipher, 'base64').toString()
     )
 
-    if (
-      typeof decoded.adata !== 'string'
-      && !await stellarKeystore.publicKey(decoded)
-    ) throw 'Invalid token'
+    if (!_.isObject(decoded)) 
+      throw 'Invalid cipher'
   
-    let qr = await qrcode.toDataURL(p_token)
+    let qr = await qrcode.toDataURL(q_cipher)
         qr = qr.replace(/^data:image\/png;base64,/, '')
 
     return {

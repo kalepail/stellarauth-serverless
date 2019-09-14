@@ -17,13 +17,11 @@ export default async (event, context) => {
         and status='sent'
     `).then((data) => _.get(data, 'rows[0]'))
 
+    if (!pgTxn)
+      throw 'Transaction doesn\'t exist or has already been accepted'
+
     if (!StellarSdk.Utils.verifyTxSignedBy(txn, pgTxn._key))
       throw `Transaction missing ${pgTxn._key.substring(0, 5)}…${pgTxn._key.substring(pgTxn._key.length - 5)} signature`
-
-    const pgKey = await Pool.query(`
-      select * from keys
-      where _key='${pgTxn._key}'
-    `).then((data) => _.get(data, 'rows[0]'))
 
     await Pool.query(`
       update txns set
@@ -33,7 +31,7 @@ export default async (event, context) => {
       where _txn='${hash}'
     `)
 
-    pusher.trigger(pgKey._user, 'txnSign', {})
+    pusher.trigger(pgTxn._user, 'txnSign', {})
 
     const result = await server
     .submitTransaction(txn)

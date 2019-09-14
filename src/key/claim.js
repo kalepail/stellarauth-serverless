@@ -1,4 +1,4 @@
-import { headers, parseError, getAuth, StellarSdk, stellarNetwork } from '../js/utils'
+import { headers, parseError, getAuth, StellarSdk, masterKeypair, stellarNetwork } from '../js/utils'
 import _ from 'lodash'
 import Pool from '../js/pg'
 import pusher from '../js/pusher'
@@ -7,8 +7,10 @@ import moment from 'moment'
 export default async (event, context) => {
   try {
     const h_auth = getAuth(event)
-    const b_token = _.get(JSON.parse(event.body), 'token')
-    const b_pubkey = _.get(JSON.parse(event.body), 'pubkey')
+    const b_key = JSON.parse(event.body)
+
+    if (!['passkey', 'app', 'cipher', 'key'].every((key) => key in b_key))
+      throw 'Malformed request body'
 
     const txn = new StellarSdk.Transaction(h_auth, stellarNetwork)
 
@@ -20,37 +22,22 @@ export default async (event, context) => {
     if (!StellarSdk.Utils.verifyTxSignedBy(txn, txn.source))
       throw `Authorization header missing ${txn.source.substring(0, 5)}…${txn.source.substring(txn.source.length - 5)} signature`
 
-    const data = JSON.parse(
-      Buffer.from(
-        _.get(
-          JSON.parse(
-            Buffer.from(
-              b_token, 
-              'base64'
-            ).toString()
-          ), 
-          'adata'
-        ), 
-        'base64'
-      ).toString()
-    )
+    let line1 = 'insert into keys (_master, _app, _user, _key, passkey, cipher'
+    let line2 = `values ('${masterKeypair.publicKey()}', '${b_key.app}', '${txn.source}', '${b_key.key}', '${b_key.passkey}', '${b_key.cipher}'`
 
-    let line1 = 'insert into keys (_master, _app, _user, _key, pubkey, cipher'
-    let line2 = `values ('${data.master}', '${data.app}', '${txn.source}', '${data.key}', '${b_pubkey}', '${b_token}'`
-
-    if (data.name) {
+    if (b_key.name) {
       line1 += ', name'
-      line2 += `, '${data.name}'`
+      line2 += `, '${b_key.name}'`
     }
 
-    if (data.image) {
+    if (b_key.image) {
       line1 += ', image'
-      line2 += `, '${data.image}'`
+      line2 += `, '${b_key.image}'`
     }
 
-    if (data.link) {
+    if (b_key.link) {
       line1 += ', link'
-      line2 += `, '${data.link}'`
+      line2 += `, '${b_key.link}'`
     }
     
     await Pool.query(`

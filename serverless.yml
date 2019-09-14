@@ -104,6 +104,6 @@ functions:
     handler: handler.img
     events:
       - http:
-          path: img/{token}
+          path: img
           method: GET
           cors: true

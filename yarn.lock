@@ -5207,11 +5207,6 @@ schema-utils@^1.0.0:
     ajv-errors "^1.0.0"
     ajv-keywords "^3.1.0"
 
-scrypt-async@^2.0.0:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/scrypt-async/-/scrypt-async-2.0.1.tgz#4318dae48a8b7cc3b8fe05f75f4164a7d973d25d"
-  integrity sha512-wHR032jldwZNy7Tzrfu7RccOgGf8r5hyDMSP2uV6DpLiBUsR8JsDcx/in73o2UGVVrH5ivRFdNsFPcjtl3LErQ==
-
 semver-diff@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/semver-diff/-/semver-diff-2.1.0.tgz#4bbb8437c8d37e4b0cf1a68fd726ec6d645d6d36"
@@ -5469,21 +5464,6 @@ static-extend@^0.1.1:
     define-property "^0.2.5"
     object-copy "^0.1.0"
 
-stellar-base@^1.0.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/stellar-base/-/stellar-base-1.1.2.tgz#7b08031f4a5cf4e95b8137472f367903a225ac3d"
-  integrity sha512-dBifZ2NPeOVtHl7pCaSCfvOedUGhKs3qIfqc/ajk9vsOFnHma0sBxb268kQhGWEAUS5tUKYei2ur4dQtB3rDSA==
-  dependencies:
-    base32.js "^0.1.0"
-    bignumber.js "^4.0.0"
-    crc "^3.5.0"
-    js-xdr "^1.1.1"
-    lodash "^4.17.11"
-    sha.js "^2.3.6"
-    tweetnacl "^1.0.0"
-  optionalDependencies:
-    sodium-native "^2.3.0"
-
 stellar-base@^2.0.1:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/stellar-base/-/stellar-base-2.0.2.tgz#0192c11ab44e7ec1d47dee2f91f94403fd82a5a5"
@@ -5498,32 +5478,6 @@ stellar-base@^2.0.1:
     tweetnacl "^1.0.0"
   optionalDependencies:
     sodium-native "^2.3.0"
-
-stellar-keystore@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/stellar-keystore/-/stellar-keystore-2.0.1.tgz#7363554d6b8e3242fb15b1444fbdeedea5593536"
-  integrity sha512-yNVW/8500Bc/Mje19GY1HdkKidMkhHiU+/RImh/kB0VKuw5YMIgfVYTGLb+OX+nCFGrJXus6LLLWLZvlyxQAFw==
-  dependencies:
-    scrypt-async "^2.0.0"
-    stellar-sdk "^1.0.2"
-    tweetnacl "^1.0.1"
-    tweetnacl-util "^0.15.0"
-
-stellar-sdk@^1.0.2:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/stellar-sdk/-/stellar-sdk-1.0.5.tgz#85e17b25b2a9a65967a67f585787933e203b4191"
-  integrity sha512-ytNHEWDc92vmv+wqI0lunS5MSfe7sS/t6x5jLAEKGZ203HqfltvRwyqV5v0FetcmG+GoXBf+N92LK+mx4vAWgw==
-  dependencies:
-    "@types/node" ">= 8"
-    axios "^0.19.0"
-    bignumber.js "^4.0.0"
-    detect-node "^2.0.4"
-    es6-promise "^4.2.4"
-    eventsource "^1.0.7"
-    lodash "^4.17.11"
-    stellar-base "^1.0.2"
-    toml "^2.3.0"
-    urijs "^1.19.1"
 
 stellar-sdk@^3.0.0:
   version "3.0.0"
@@ -5903,7 +5857,7 @@ tweetnacl@^0.14.3, tweetnacl@~0.14.0:
   resolved "https://registry.yarnpkg.com/tweetnacl/-/tweetnacl-0.14.5.tgz#5ae68177f192d4456269d108afa93ff8743f4f64"
   integrity sha1-WuaBd/GS1EViadEIr6k/+HQ/T2Q=
 
-tweetnacl@^1.0.0, tweetnacl@^1.0.1:
+tweetnacl@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/tweetnacl/-/tweetnacl-1.0.1.tgz#2594d42da73cd036bd0d2a54683dd35a6b55ca17"
   integrity sha512-kcoMoKTPYnoeS50tzoqjPY3Uv9axeuuFAZY9M/9zFnhoVvRfxz9K29IMPD7jGmt2c8SW7i3gT9WqDl2+nV7p4A==

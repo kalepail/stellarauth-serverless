@@ -27,7 +27,6 @@
     "bluebird": "^3.5.5",
     "crypto": "^1.0.1",
     "firebase-admin": "^8.5.0",
-    "jsonwebtoken": "^8.5.1",
     "lodash": "4.17.13",
     "moment": "^2.24.0",
     "pg": "^7.12.1",
@@ -36,7 +35,6 @@
     "sha.js": "^2.4.11",
     "sjcl": "https://github.com/tyvdh/sjcl.git",
     "source-map-support": "^0.5.13",
-    "stellar-keystore": "^2.0.1",
     "stellar-sdk": "^3.0.0",
     "valid-url": "^1.0.9"
   }
