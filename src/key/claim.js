@@ -3,13 +3,14 @@ import _ from 'lodash'
 import Pool from '../js/pg'
 import pusher from '../js/pusher'
 import moment from 'moment'
+import jwt from 'jsonwebtoken'
 
 export default async (event, context) => {
   try {
     const h_auth = getAuth(event)
-    const b_key = JSON.parse(event.body)
+    const body = JSON.parse(event.body)
 
-    if (!['passkey', 'app', 'cipher', 'key'].every((key) => key in b_key))
+    if (!['jwt', 'cipher', 'key'].every((key) => key in body))
       throw 'Malformed request body'
 
     const txn = new StellarSdk.Transaction(h_auth, stellarNetwork)
@@ -22,22 +23,24 @@ export default async (event, context) => {
     if (!StellarSdk.Utils.verifyTxSignedBy(txn, txn.source))
       throw `Authorization header missing ${txn.source.substring(0, 5)}…${txn.source.substring(txn.source.length - 5)} signature`
 
+    const {data: key} = jwt.verify(body.jwt, masterKeypair.rawSecretKey())
+
     let line1 = 'insert into keys (_master, _app, _user, _key, passkey, cipher'
-    let line2 = `values ('${masterKeypair.publicKey()}', '${b_key.app}', '${txn.source}', '${b_key.key}', '${b_key.passkey}', '${b_key.cipher}'`
+    let line2 = `values ('${masterKeypair.publicKey()}', '${key.app}', '${txn.source}', '${body.key}', '${key.passkey}', '${body.cipher}'`
 
-    if (b_key.name) {
+    if (key.name) {
       line1 += ', name'
-      line2 += `, '${b_key.name}'`
+      line2 += `, '${key.name}'`
     }
 
-    if (b_key.image) {
+    if (key.image) {
       line1 += ', image'
-      line2 += `, '${b_key.image}'`
+      line2 += `, '${key.image}'`
     }
 
-    if (b_key.link) {
+    if (key.link) {
       line1 += ', link'
-      line2 += `, '${b_key.link}'`
+      line2 += `, '${key.link}'`
     }
     
     await Pool.query(`
