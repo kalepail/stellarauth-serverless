@@ -5,6 +5,7 @@ service: stellarauth
 plugins:
   - serverless-webpack
   - serverless-offline
+  - serverless-apigw-binary
   - serverless-domain-manager
 
 custom:
@@ -13,9 +14,15 @@ custom:
     certificateName: ${opt:subdomain}.stellarauth.com
     stage: ${opt:stage}
     createRoute53Record: false
+  apigwBinary:
+    types:
+      - 'image/*'
+      - 'image/png'
+      - 'text/html'
   webpack:
     webpackConfig: ./webpack.config.js
     includeModules: true
+    packager: yarn
   serverless-offline:
     httpsProtocol: certs
     port: 4000
@@ -28,10 +35,75 @@ provider:
   environment: ${file(env.yml):${opt:stage}}
 
 functions:
-  auth:
-    handler: handler.auth
+  keyCreate:
+    handler: handler.key
     events:
       - http:
-          path: auth
-          method: get
+          path: key/create
+          method: POST
+          cors: true
+  keyUpdate:
+    handler: handler.key
+    events:
+      - http:
+          path: key/update
+          method: PUT
+          cors: true
+  keyClaim:
+    handler: handler.key
+    events:
+      - http:
+          path: key/claim
+          method: POST
+          cors: true
+  keyVerify:
+    handler: handler.key
+    events:
+      - http:
+          path: key/verify
+          method: POST
+          cors: true
+  keyList:
+    handler: handler.key
+    events:
+      - http:
+          path: key/list
+          method: GET
+          cors: true
+
+  txnSend:
+    handler: handler.txn
+    events:
+      - http:
+          path: txn/send
+          method: POST
+          cors: true
+  txnSign:
+    handler: handler.txn
+    events:
+      - http:
+          path: txn/sign
+          method: POST
+          cors: true
+  txnReject:
+    handler: handler.txn
+    events:
+      - http:
+          path: txn/reject
+          method: DELETE
+          cors: true
+  txnList:
+    handler: handler.txn
+    events:
+      - http:
+          path: txn/list
+          method: GET
+          cors: true
+
+  imgShow:
+    handler: handler.img
+    events:
+      - http:
+          path: img
+          method: GET
           cors: true
