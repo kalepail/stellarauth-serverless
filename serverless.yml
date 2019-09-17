@@ -1,6 +1,6 @@
 tenant: tyvdh
 app: stellarauth
-service: stellarauth-full
+service: stellarauth
 
 plugins:
   - serverless-webpack
