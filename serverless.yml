@@ -6,14 +6,14 @@ plugins:
   - serverless-webpack
   - serverless-offline
   - serverless-apigw-binary
-  # - serverless-domain-manager
+  - serverless-domain-manager
 
 custom:
-  # customDomain:
-  #   domainName: ${opt:subdomain}.stellarauth.com
-  #   certificateName: ${opt:subdomain}.stellarauth.com
-  #   stage: ${opt:stage}
-  #   createRoute53Record: false
+  customDomain:
+    domainName: ${opt:subdomain}.stellarauth.com
+    certificateName: ${opt:subdomain}.stellarauth.com
+    stage: ${opt:stage}
+    createRoute53Record: false
   apigwBinary:
     types:
       - 'image/*'
