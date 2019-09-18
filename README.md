@@ -8,15 +8,15 @@ StellarAuth is a developer API and user application service for **easily and sec
 - **Galactic Talk:** [https://galactictalk.org/d/2137-stellarauth-easily-and-securely-manage-lots-of-stellar-accounts](https://galactictalk.org/d/2137-stellarauth-easily-and-securely-manage-lots-of-stellar-accounts)
 
 - **API Docs:** https://www.notion.so/stellarauth/StellarAuth-085c9270636b4196979dc49cf296cf03
-- **API Code:** https://github.com/TinyAnvil/stellarauth-serverless/tree/full
+- **API Code:** https://github.com/TinyAnvil/stellarauth-serverless
 
 - **Data Faker Service:** [https://stellarauth-faker.glitch.me](https://stellarauth-faker.glitch.me/)
     - Generates a demo app key which once scanned will automatically verify and send 5 example transactions arriving over the course of five minutes
     
-- **Web App:** [https://stellarauth.now.sh](https://stellarauth.now.sh/) (For testing only, will not support the public network)
+- **Web App:** [https://demo.stellarauth.com](https://demo.stellarauth.com) (For testing only, will not support the public network)
 - **Desktop Apps:**
-    - **Windows**: [https://cl.ly/4dc15dcb7294](https://cl.ly/4dc15dcb7294)
-    - **Mac**: [https://cl.ly/6c7eec2d6757](https://cl.ly/6c7eec2d6757)
+    - **Windows**: [https://tyvdh.keybase.pub/StellarAuth Setup 0.0.7.exe?dl=1](https://tyvdh.keybase.pub/StellarAuth%20Setup%200.0.7.exe?dl=1)
+    - **Mac**: [https://tyvdh.keybase.pub/StellarAuth-0.0.7.dmg?dl=1](https://tyvdh.keybase.pub/StellarAuth-0.0.7.dmg?dl=1)
 - **Mobile Apps:**
-    - **Android:** Coming soon
+    - **Android:** [https://play.google.com/apps/testing/com.stellarauth](https://play.google.com/apps/testing/com.stellarauth)
     - **iOS:** [https://testflight.apple.com/join/Slcgw56c](https://testflight.apple.com/join/Slcgw56c)
