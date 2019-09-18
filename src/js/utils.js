@@ -1,4 +1,4 @@
-import * as _StellarSdk from 'stellar-sdk'
+import StellarSdk from 'stellar-sdk'
 import _ from 'lodash'
 
 export const isDev = process.env.NODE_ENV !== 'production'
@@ -6,10 +6,10 @@ export const isTestnet = process.env.STELLAR_NETWORK === 'TESTNET'
 
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = isDev ? 0 : 1
 
-export const server = new _StellarSdk.Server(process.env.HORIZON_URL)
-export const masterKeypair = _StellarSdk.Keypair.fromSecret(process.env.MASTER_SECRET)
-export const stellarNetwork = _StellarSdk.Networks[process.env.STELLAR_NETWORK]
-export const StellarSdk = _StellarSdk
+export const server = new StellarSdk.Server(process.env.HORIZON_URL)
+export const masterKeypair = StellarSdk.Keypair.fromSecret(process.env.MASTER_SECRET)
+export const stellarNetwork = StellarSdk.Networks[process.env.STELLAR_NETWORK]
+export { StellarSdk }
 
 export const headers = {
   'Access-Control-Allow-Origin': '*',
