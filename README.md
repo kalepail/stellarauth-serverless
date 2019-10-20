@@ -15,8 +15,8 @@ StellarAuth is a developer API and user application service for **easily and sec
     
 - **Web App:** [https://demo.stellarauth.com](https://demo.stellarauth.com) (For testing only, will not support the public network)
 - **Desktop Apps:**
-    - **Windows**: [https://tyvdh.keybase.pub/StellarAuth.exe](https://tyvdh.keybase.pub/StellarAuth%20Setup%200.0.8.exe?dl=1)
-    - **Mac**: [https://tyvdh.keybase.pub/StellarAuth.dmg](https://tyvdh.keybase.pub/StellarAuth-0.0.8.dmg?dl=1)
+    - **Windows**: [https://tyvdh.keybase.pub/StellarAuth.exe](https://tyvdh.keybase.pub/StellarAuth.exe?dl=1)
+    - **Mac**: [https://tyvdh.keybase.pub/StellarAuth.pkg](https://tyvdh.keybase.pub/StellarAuth.pkg?dl=1)
 - **Mobile Apps:**
     - **Android:** [https://play.google.com/apps/testing/com.stellarauth](https://play.google.com/apps/testing/com.stellarauth)
     - **iOS:** [https://testflight.apple.com/join/Slcgw56c](https://testflight.apple.com/join/Slcgw56c)
