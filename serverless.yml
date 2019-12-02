@@ -22,7 +22,7 @@ custom:
   webpack:
     webpackConfig: ./webpack.config.js
     includeModules: true
-    packager: yarn
+    packager: npm
   serverless-offline:
     httpsProtocol: certs
     port: 4000

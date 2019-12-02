@@ -1,0 +1,1 @@
+UPDATE txns SET status = 'sent'
