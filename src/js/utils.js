@@ -31,14 +31,14 @@ export function getAuth(event) {
 }
 
 export function parseError(err) {
-  const error = 
-  typeof err === 'string' 
-  ? { message: err } 
-  : err.response && err.response.data 
-  ? err.response.data 
-  : err.response 
+  const error =
+  typeof err === 'string'
+  ? { message: err }
+  : err.response && err.response.data
+  ? err.response.data
+  : err.response
   ? err.response
-  : err.message 
+  : err.message
   ? { message: err.message }
   : err
 

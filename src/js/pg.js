@@ -8,6 +8,6 @@ export default new Pool({
   password: process.env.PG_PASSWORD,
   connectionTimeoutMillis: 5000,
   idleTimeoutMillis: 10,
-  ssl: true,
+  // ssl: true,
   max: 1000
 })

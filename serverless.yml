@@ -1,4 +1,4 @@
-tenant: tyvdh
+org: tyvdh
 app: stellarauth
 service: stellarauth
 
@@ -11,25 +11,29 @@ plugins:
 custom:
   customDomain:
     domainName: ${opt:subdomain}.stellarauth.com
-    certificateName: ${opt:subdomain}.stellarauth.com
     stage: ${opt:stage}
+    certificateName: ${opt:subdomain}.stellarauth.com
     createRoute53Record: false
+    autoDomain: false
   apigwBinary:
     types:
       - 'image/*'
       - 'image/png'
       - 'text/html'
   webpack:
-    webpackConfig: ./webpack.config.js
-    includeModules: true
+    webpackConfig: webpack.config.js
+    keepOutputDirectory: true
+    includeModules:
+      forceInclude:
+        - source-map-support
     packager: npm
   serverless-offline:
     httpsProtocol: certs
-    port: 4000
+    httpPort: 4000
 
 provider:
   name: aws
-  runtime: nodejs10.x
+  runtime: nodejs12.x
   stage: ${opt:stage}
   region: us-east-1
   environment: ${file(env.yml):${opt:stage}}
