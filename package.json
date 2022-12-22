@@ -27,7 +27,7 @@
     "bluebird": "^3.7.2",
     "crypto": "^1.0.1",
     "firebase-admin": "^9.4.2",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "lodash": "4.17.20",
     "moment": "^2.29.1",
     "pg": "^8.5.1",
